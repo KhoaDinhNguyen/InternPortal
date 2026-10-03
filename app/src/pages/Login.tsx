@@ -1,61 +1,57 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useActionState, useState } from "react";
+import { useLocation, Navigate, type Location } from "react-router";
 import { supabase } from "../lib/supabase";
 import colors from "@styles/colors";
-import { SEED_USERS } from "../features/login/mockData";
+import { MOCK_USERS, ROLE_LABELS } from "../features/login/mockData";
+import { useAuth } from "../features/login/useAuth";
+
+const DEMO_USERS = MOCK_USERS.filter((u) => u.role);
+
+const field: React.CSSProperties = {
+  width: "100%",
+  padding: "10px 14px",
+  borderRadius: 8,
+  border: "1.5px solid #C8DCF0",
+  fontFamily: "Helvetica, Arial, sans-serif",
+  fontSize: 14,
+  color: "#1A1A1A",
+  outline: "none",
+  background: "#fff",
+  boxSizing: "border-box",
+};
+
+const label: React.CSSProperties = {
+  fontFamily: "Helvetica, Arial, sans-serif",
+  fontSize: 12,
+  fontWeight: 600,
+  color: "#1A1A1A",
+  letterSpacing: "0.04em",
+  display: "block",
+  marginBottom: 6,
+};
 
 export default function LoginPage() {
-  const navigate = useNavigate();
+  const { user } = useAuth();
+  const location = useLocation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [showPw, setShowPw] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  async function attempt() {
-    if (loading) return;
+  const [error, submit, pending] = useActionState(async () => {
+    const { error } = await supabase.auth.signInWithPassword({ email: email, password: password });
 
-    setError("");
-    setLoading(true);
+    if (!error) return "";
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
+    return error.status === 403
+      ? "Your account hasn't been activated yet. Please contact an administrator."
+      : "Incorrect email or password.";
+  }, "");
 
-    if (error) {
-      setLoading(false);
-      setError("Incorrect email or password.");
-      return;
-    }
-
-    const found = SEED_USERS.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
-
-    if (!found?.role) {
-      setError("Your account hasn't been activated yet. Please contact an administrator.");
-      setLoading(false);
-      return;
-    }
-
-    setError("");
-    setLoading(false);
-
-    navigate("/");
+  if (user) {
+    const from = (location.state as { from?: Location } | null)?.from?.pathname ?? "/";
+    return <Navigate to={from} replace />;
   }
-
-  const field: React.CSSProperties = {
-    width: "100%",
-    padding: "10px 14px",
-    borderRadius: 8,
-    border: "1.5px solid #C8DCF0",
-    fontFamily: "Helvetica, Arial, sans-serif",
-    fontSize: 14,
-    color: "#1A1A1A",
-    outline: "none",
-    background: "#fff",
-    boxSizing: "border-box",
-  };
 
   return (
     <div
@@ -100,54 +96,24 @@ export default function LoginPage() {
             boxShadow: "0 4px 24px rgba(10,26,50,0.08)",
             padding: "32px 32px 28px",
           }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <form action={submit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div>
-              <label
-                style={{
-                  fontFamily: "Helvetica, Arial, sans-serif",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "#1A1A1A",
-                  letterSpacing: "0.04em",
-                  display: "block",
-                  marginBottom: 6,
-                }}>
-                EMAIL ADDRESS
-              </label>
+              <label style={label}>EMAIL ADDRESS</label>
               <input
                 type="email"
                 value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setError("");
-                }}
-                onKeyDown={(e) => e.key === "Enter" && attempt()}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@portal.com"
                 style={field}
               />
             </div>
             <div>
-              <label
-                style={{
-                  fontFamily: "Helvetica, Arial, sans-serif",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "#1A1A1A",
-                  letterSpacing: "0.04em",
-                  display: "block",
-                  marginBottom: 6,
-                }}>
-                PASSWORD
-              </label>
+              <label style={label}>PASSWORD</label>
               <div style={{ position: "relative" }}>
                 <input
                   type={showPw ? "text" : "password"}
                   value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setError("");
-                  }}
-                  onKeyDown={(e) => e.key === "Enter" && attempt()}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   style={{ ...field, paddingRight: 40 }}
                 />
@@ -186,7 +152,8 @@ export default function LoginPage() {
             )}
 
             <button
-              onClick={attempt}
+              type="submit"
+              disabled={pending}
               style={{
                 width: "100%",
                 padding: "11px",
@@ -203,9 +170,9 @@ export default function LoginPage() {
               }}
               onMouseEnter={(e) => (e.currentTarget.style.background = colors.MAGENTA_DARK)}
               onMouseLeave={(e) => (e.currentTarget.style.background = colors.MAGENTA)}>
-              Sign In
+              {pending ? "Signing in…" : "Sign In"}
             </button>
-          </div>
+          </form>
 
           <div
             style={{
@@ -249,7 +216,6 @@ export default function LoginPage() {
               onClick={() => {
                 setEmail(em);
                 setPassword(pw);
-                setError("");
               }}
               style={{
                 display: "block",

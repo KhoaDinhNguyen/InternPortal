@@ -1,20 +1,12 @@
-export type UserRole = "admin" | "northstar" | "intern"
+import type { User } from "../../lib/supabase.types"
 
-export interface AppUser {
-  email: string
-  password: string
-  role: UserRole | null
-  profile: {
-    name: string
-    preferredName: string
-    title: string
-    phone: string
-  } | null
-}
+export type UserRole = "admin" | "northstar" | "intern";
 
-export interface User {
-  id: string;
-  email: string;
+export interface Profile {
+  name: string;
+  preferredName: string;
+  title: string;
+  phone: string;
 }
 
 export interface MockUser extends User {

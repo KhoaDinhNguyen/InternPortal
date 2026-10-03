@@ -1,5 +1,5 @@
-import type { Session, AuthChangeEvent, AuthError, AuthListener } from "./supabase.types";
-import type { MockUser, User } from "../features/login/types";
+import type { Session, AuthChangeEvent, AuthError, AuthListener, User } from "./supabase.types";
+import type { MockUser } from "../features/login/types";
 import { MOCK_USERS } from "../features/login/mockData";
 
 const STORAGE_KEY = "mock-supabase-session";

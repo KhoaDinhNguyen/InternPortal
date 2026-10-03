@@ -18,12 +18,14 @@ import { useDocs } from "../features/quickDocs/hooks";
 import { QUICK_DOCS } from "../features/quickDocs/mockData";
 import QuickLinksNav from "../features/quickLinks/components/QuickLinksNav";
 import QuickLinksWidget from "../features/quickLinks/components/QuickLinksWidget";
-import colors from "@styles/colors";
-import Avatar from "@icons/Avatar";
+import UserMenuButton from "@components/UserMenuButton";
+
+import { useAuth } from "../features/login/useAuth";
 
 type ExpandedPanel = "todo" | "calendar" | "announcements" | "links" | "docs" | "dms" | "hours" | null;
 
 export default function DashboardPage() {
+  const { user } = useAuth();
   const [expanded, setExpanded] = useState<ExpandedPanel>(null);
   const { anns, pushAnn, openIds, toggleBody, deleteAnn } = useAnnouncements();
   const { entries, addEntries } = useHoursEntries();
@@ -47,6 +49,8 @@ export default function DashboardPage() {
   const hour = now.getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
   const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+
+  if (!user) return null;
 
   return (
     <div style={{ minHeight: "100vh", background: "#FFFFFF" }}>
@@ -75,40 +79,7 @@ export default function DashboardPage() {
             {dateStr.toUpperCase()}
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 9,
-              padding: "5px 10px",
-              borderRadius: 10,
-              background: colors.MAGENTA_LIGHT,
-            }}>
-            <Avatar name={"Jordan Lee"} size={28} />
-            <div>
-              <div
-                style={{
-                  fontFamily: "Helvetica, Arial, sans-serif",
-                  fontWeight: 600,
-                  fontSize: 14,
-                  color: "#1A1A1A",
-                  lineHeight: 1.2,
-                }}>
-                {"Jordan Lee"}
-              </div>
-              <div
-                style={{
-                  fontFamily: "Helvetica, Arial, sans-serif",
-                  fontSize: 12,
-                  color: colors.MAGENTA,
-                  letterSpacing: "0.04em",
-                }}>
-                ENG · INTERN
-              </div>
-            </div>
-          </div>
-        </div>
+        <UserMenuButton currentUser={user} />
       </header>
 
       <main style={{ padding: "28px 32px", maxWidth: 1280, margin: "0 auto" }}>
@@ -123,7 +94,7 @@ export default function DashboardPage() {
               margin: 0,
               lineHeight: 1.1,
             }}>
-            {greeting}, Jordan 👋
+            {greeting}, {user.profile?.preferredName ?? user.email} 👋
           </h1>
           <p style={{ fontFamily: "Helvetica, Arial, sans-serif", fontSize: 16, color: "#1A1A1A", margin: "5px 0 0" }}>
             {"Here's what's happening in your internship portal today."}

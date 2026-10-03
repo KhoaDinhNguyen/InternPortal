@@ -3,16 +3,19 @@ import "./App.css";
 import DashboardPage from "./pages/Dashboard";
 import LoginPage from "./pages/Login";
 import ProtectedRoute from "@components/ProtectedRoute";
+import AuthProvider from "./features/login/AuthProvider";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
+    <AuthProvider>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
 
-      <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<DashboardPage />} />
-      </Route>
-    </Routes>
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<DashboardPage />} />
+        </Route>
+      </Routes>
+    </AuthProvider>
   );
 }
 

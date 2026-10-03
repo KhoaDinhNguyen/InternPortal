@@ -1,6 +1,10 @@
+import type { Profile, UserRole } from "../features/login/types";
+
 export interface User {
   id: string;
   email: string;
+  role: UserRole | null;
+  profile: Profile | null;
 }
 
 export interface Session {
@@ -18,7 +22,3 @@ export interface AuthError {
 export type AuthChangeEvent = "SIGNED_IN" | "SIGNED_OUT";
 
 export type AuthListener = (event: AuthChangeEvent, session: Session | null) => void;
-
-export interface MockUser extends User {
-  password: string;
-}
