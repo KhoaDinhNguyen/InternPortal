@@ -187,3 +187,30 @@
   margin: 0;
   padding: 0;
 }
+
+.app-header,
+.app-subnav {
+  padding: 0 32px;
+}
+.app-main {
+  padding: 28px 32px;
+}
+
+.admin-create-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .app-header,
+  .app-subnav {
+    padding: 0 16px;
+  }
+  .app-main {
+    padding: 20px 16px;
+  }
+  .admin-create-grid {
+    grid-template-columns: 1fr;
+  }
+}

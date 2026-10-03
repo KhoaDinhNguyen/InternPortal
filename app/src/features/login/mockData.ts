@@ -29,7 +29,7 @@ export const MOCK_USERS: MockUser[] = [
 ];
 
 export const ROLE_LABELS: Record<UserRole, string> = {
-  admin: "Administrator",
+  admin: "Admin",
   northstar: "NorthStar",
   intern: "Intern",
 };

@@ -2,10 +2,7 @@ import { useActionState, useState } from "react";
 import { useLocation, Navigate, type Location } from "react-router";
 import { supabase } from "../lib/supabase";
 import colors from "@styles/colors";
-import { MOCK_USERS, ROLE_LABELS } from "../features/login/mockData";
 import { useAuth } from "../features/login/useAuth";
-
-const DEMO_USERS = MOCK_USERS.filter((u) => u.role);
 
 const field: React.CSSProperties = {
   width: "100%",
@@ -98,8 +95,11 @@ export default function LoginPage() {
           }}>
           <form action={submit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div>
-              <label style={label}>EMAIL ADDRESS</label>
+              <label htmlFor="email" style={label}>
+                EMAIL ADDRESS
+              </label>
               <input
+                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -108,9 +108,12 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label style={label}>PASSWORD</label>
+              <label htmlFor="password" style={label}>
+                PASSWORD
+              </label>
               <div style={{ position: "relative" }}>
                 <input
+                  id="password"
                   type={showPw ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -118,6 +121,7 @@ export default function LoginPage() {
                   style={{ ...field, paddingRight: 40 }}
                 />
                 <button
+                  type="button"
                   onClick={() => setShowPw((s) => !s)}
                   style={{
                     position: "absolute",

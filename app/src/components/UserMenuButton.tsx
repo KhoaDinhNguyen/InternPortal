@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from "react";
 import Avatar from "@icons/Avatar";
 import colors from "@styles/colors";
 import { ROLE_LABELS, ROLE_COLORS } from "../features/login/mockData";
-import { useNavigate } from "react-router";
 import { supabase } from "../lib/supabase";
 import type { User } from "../lib/supabase.types";
 
@@ -14,7 +13,6 @@ interface UserMenuButtonProps {
 export default function UserMenuButton({ currentUser }: UserMenuButtonProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -35,8 +33,6 @@ export default function UserMenuButton({ currentUser }: UserMenuButtonProps) {
       alert("Couldn't log out. Please try again.");
       return;
     }
-
-    navigate("/login", { replace: true });
   }
 
   const isAdmin = currentUser.role === "admin";
@@ -51,7 +47,7 @@ export default function UserMenuButton({ currentUser }: UserMenuButtonProps) {
           gap: 9,
           padding: "5px 10px",
           borderRadius: 10,
-          background: menuOpen ? colors.MAGENTA_LIGHT : colors.MAGENTA_LIGHT,
+          background: colors.MAGENTA_LIGHT,
           border: `1.5px solid ${menuOpen ? colors.MAGENTA : "transparent"}`,
           cursor: "pointer",
         }}>
@@ -150,7 +146,7 @@ export default function UserMenuButton({ currentUser }: UserMenuButtonProps) {
                     icon: "⚙️",
                     action: () => {
                       setMenuOpen(false);
-                      // onGoAdmin();
+                      window.open("/admin", "_blank", "noopener,noreferrer");
                     },
                   },
                 ]

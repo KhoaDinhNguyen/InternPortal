@@ -19,10 +19,17 @@ import { QUICK_DOCS } from "../features/quickDocs/mockData";
 import QuickLinksNav from "../features/quickLinks/components/QuickLinksNav";
 import QuickLinksWidget from "../features/quickLinks/components/QuickLinksWidget";
 import UserMenuButton from "@components/UserMenuButton";
-
+import { Link } from "react-router";
+import colors from "@styles/colors";
 import { useAuth } from "../features/login/useAuth";
 
 type ExpandedPanel = "todo" | "calendar" | "announcements" | "links" | "docs" | "dms" | "hours" | null;
+
+const text = (fontSize: number, color = "#1A1A1A"): React.CSSProperties => ({
+  fontFamily: "Helvetica, Arial, sans-serif",
+  fontSize,
+  color,
+});
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -51,6 +58,8 @@ export default function DashboardPage() {
   const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
   if (!user) return null;
+
+  const isAdmin = user.role === "admin";
 
   return (
     <div style={{ minHeight: "100vh", background: "#FFFFFF" }}>
@@ -81,6 +90,48 @@ export default function DashboardPage() {
         </div>
         <UserMenuButton currentUser={user} />
       </header>
+
+      {isAdmin && (
+        <nav
+          className="app-subnav"
+          style={{ background: "#fff", borderBottom: "1px solid #C8DCF0", display: "flex", alignItems: "stretch" }}>
+          <div
+            style={{
+              ...text(14, colors.MAGENTA),
+              padding: "0 20px",
+              display: "flex",
+              alignItems: "center",
+              fontWeight: 700,
+              borderBottom: `2px solid ${colors.MAGENTA}`,
+            }}>
+            Portal
+          </div>
+          <Link
+            to="/admin"
+            target="_blank"
+            style={{
+              ...text(14),
+              padding: "0 20px",
+              height: 44,
+              display: "flex",
+              alignItems: "center",
+              fontWeight: 500,
+              textDecoration: "none",
+              borderBottom: "2px solid transparent",
+              transition: "color 0.15s, border-color 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = colors.MAGENTA;
+              e.currentTarget.style.borderBottomColor = `${colors.MAGENTA}55`;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "#1A1A1A";
+              e.currentTarget.style.borderBottomColor = "transparent";
+            }}>
+            Admin
+          </Link>
+        </nav>
+      )}
 
       <main style={{ padding: "28px 32px", maxWidth: 1280, margin: "0 auto" }}>
         {/* Greeting */}

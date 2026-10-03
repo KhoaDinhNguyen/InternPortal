@@ -6,7 +6,7 @@ import { AuthContext } from "./useAuth";
 /** The only place that subscribes to auth changes; everything else reads `useAuth()` */
 export default function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Restore an existing session on first render
