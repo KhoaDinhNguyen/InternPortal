@@ -8,6 +8,8 @@ interface PostAnnButtonProps {
 export default function PostAnnButton({ isFormOpen, setFormOpen }: PostAnnButtonProps) {
   return (
     <button
+      type="button"
+      aria-expanded={isFormOpen}
       onClick={() => setFormOpen(!isFormOpen)}
       style={{
         padding: "4px 10px",
@@ -21,7 +23,7 @@ export default function PostAnnButton({ isFormOpen, setFormOpen }: PostAnnButton
         cursor: "pointer",
         transition: "all 0.15s",
       }}>
-      + Post
+      {isFormOpen ? "Cancel" : "+ Post"}
     </button>
   );
 }

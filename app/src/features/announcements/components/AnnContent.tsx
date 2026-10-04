@@ -9,18 +9,16 @@ interface AnnContentProps {
   deleteAnn: (id: number) => void;
 }
 
-{
-  /* Renders the content of the annoucement
-  - Title
-  - Body (only when the user expand the announcement)
-  - delete function
-  */
-}
+/* Renders the content of the annoucement
+- Title
+- Body (only when the user expand the announcement)
+- delete function
+*/
 export default function AnnContent(props: AnnContentProps) {
   const { ann, toggleAnnBody, openIds, deleteAnn } = props;
 
   return (
-    <div key={ann.id} style={{ borderBottom: "1px solid #D4E6F5" }}>
+    <div style={{ borderBottom: "1px solid #D4E6F5" }}>
       <div
         role="button"
         tabIndex={0}
