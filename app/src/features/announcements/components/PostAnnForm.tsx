@@ -1,27 +1,34 @@
 import colors from "@styles/colors";
+import type { usePostAnnouncements } from "../hooks";
+
+const TAGS = ["General", "Welcome", "HR", "Events", "Operations"];
+
+const input: React.CSSProperties = {
+  padding: "8px 10px",
+  borderRadius: 7,
+  border: "1px solid #C8DCF0",
+  fontFamily: "Helvetica, Arial, sans-serif",
+  color: "#1A1A1A",
+  outline: "none",
+  background: "#fff",
+};
 
 interface PostAnnFormProps {
-  title: string;
-  body: string;
-  tag: string;
-  setTitle: (s: string) => void;
-  setBody: (s: string) => void;
-  setTag: (s: string) => void;
-  post: () => void;
+  form: ReturnType<typeof usePostAnnouncements>;
+  onPost: () => void;
 }
 
-{
-  /** Renderes the form for creating new announcement, include:
+/** Renderes the form for creating new announcement, include:
   - Input: title, body, tag
   - post function
 */
-}
-
-export default function PostAnnForm(props: PostAnnFormProps) {
-  const { title, setTitle, body, setBody, tag, setTag, post } = props;
-
+export default function PostAnnForm({ form, onPost }: PostAnnFormProps) {
   return (
-    <div
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onPost();
+      }}
       style={{
         margin: "0 20px 14px",
         padding: 14,
@@ -33,59 +40,33 @@ export default function PostAnnForm(props: PostAnnFormProps) {
         gap: 8,
       }}>
       <input
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        aria-label="Announcement title"
+        value={form.title}
+        onChange={(e) => form.setTitle(e.target.value)}
         placeholder="Announcement title"
-        style={{
-          padding: "8px 10px",
-          borderRadius: 7,
-          border: "1px solid #C8DCF0",
-          fontFamily: "Helvetica, Arial, sans-serif",
-          fontSize: 16,
-          fontWeight: 600,
-          color: "#1A1A1A",
-          outline: "none",
-          background: "#fff",
-        }}
+        style={{ ...input, fontSize: 16, fontWeight: 600 }}
       />
       <textarea
-        value={body}
-        onChange={(e) => setBody(e.target.value)}
+        aria-label="Announcement body"
+        value={form.body}
+        onChange={(e) => form.setBody(e.target.value)}
         placeholder="Body (optional)"
         rows={2}
-        style={{
-          padding: "8px 10px",
-          borderRadius: 7,
-          border: "1px solid #C8DCF0",
-          fontFamily: "Helvetica, Arial, sans-serif",
-          fontSize: 14,
-          color: "#1A1A1A",
-          outline: "none",
-          resize: "none",
-          background: "#fff",
-        }}
+        style={{ ...input, fontSize: 14, resize: "none" }}
       />
       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
         <select
-          value={tag}
-          onChange={(e) => setTag(e.target.value)}
-          style={{
-            padding: "6px 10px",
-            borderRadius: 7,
-            border: "1px solid #C8DCF0",
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            color: "#1A1A1A",
-            outline: "none",
-            background: "#fff",
-            cursor: "pointer",
-          }}>
-          {["General", "Welcome", "HR", "Events", "Operations"].map((t) => (
+          aria-label="Tag"
+          value={form.tag}
+          onChange={(e) => form.setTag(e.target.value)}
+          style={{ ...input, padding: "6px 10px", fontSize: 14, cursor: "pointer" }}>
+          {TAGS.map((t) => (
             <option key={t}>{t}</option>
           ))}
         </select>
         <button
-          onClick={post}
+          type="submit"
+          disabled={!form.title.trim()}
           style={{
             marginLeft: "auto",
             padding: "6px 16px",
@@ -96,11 +77,12 @@ export default function PostAnnForm(props: PostAnnFormProps) {
             fontFamily: "Helvetica, Arial, sans-serif",
             fontSize: 14,
             fontWeight: 600,
-            cursor: "pointer",
+            cursor: form.title.trim() ? "pointer" : "default",
+            opacity: form.title.trim() ? 1 : 0.6,
           }}>
           Post to team
         </button>
       </div>
-    </div>
+    </form>
   );
 }

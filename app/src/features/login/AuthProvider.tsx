@@ -10,7 +10,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Restore an existing session on first render
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.refreshSession().then(({ data }) => {
       setSession(data.session);
       setLoading(false);
     });

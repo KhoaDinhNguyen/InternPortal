@@ -19,6 +19,6 @@ export interface AuthError {
   status: number;
 }
 
-export type AuthChangeEvent = "SIGNED_IN" | "SIGNED_OUT";
+export type AuthChangeEvent = "SIGNED_IN" | "SIGNED_OUT" | "USER_UPDATED";
 
 export type AuthListener = (event: AuthChangeEvent, session: Session | null) => void;

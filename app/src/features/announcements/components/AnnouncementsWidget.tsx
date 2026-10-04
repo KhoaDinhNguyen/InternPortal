@@ -4,38 +4,26 @@ import { usePostAnnouncements } from "../hooks";
 import PostAnnButton from "./PostAnnButton";
 import PostAnnForm from "./PostAnnForm";
 import AnnContent from "./AnnContent";
-import type { Announcement } from "../types";
+import type { AnnouncementStore } from "../types";
 
 interface AnnouncementsWidgetProps {
-  anns: Announcement[];
-  pushAnn: (title: string, body: string, tag: string) => Announcement | null;
-  openIds: Set<number>;
-  toggleBody: (id: number) => void;
-  deleteAnn: (id: number) => void;
+  annStore: AnnouncementStore;
   onExpand?: () => void;
   onClose?: () => void;
 }
 
-{
-  /** Renders announcement tabs, include:
-  - Create announcement button & form
-  - Annoucement list
-  */
-}
-export default function AnnouncementsWidget(props: AnnouncementsWidgetProps) {
-  const { anns, pushAnn, openIds, toggleBody, deleteAnn, onExpand, onClose } = props;
-  const postAnnsForm = usePostAnnouncements();
+/**
+ * Renders the announcements card, including:
+ * - the "+ Post" button and the new-announcement form
+ * - the list (personal notices first, then team announcements)
+ */
+export default function AnnouncementsWidget({ annStore, onExpand, onClose }: AnnouncementsWidgetProps) {
+  const { anns, openIds, pushAnn, toggleBody, deleteAnn } = annStore;
+  const form = usePostAnnouncements();
 
   function post() {
-    const { title, body, tag } = postAnnsForm;
-
-    const newAnns = pushAnn(title, body, tag);
-
-    // stop the post function when the new announcement is invalid
-    if (!newAnns) return;
-
-    // resets the form if the new announcement is valid
-    postAnnsForm.reset();
+    // pushAnn returns null for an invalid announcement; keep the form open then
+    if (pushAnn(form.title, form.body, form.tag)) form.reset();
   }
 
   return (
@@ -45,39 +33,28 @@ export default function AnnouncementsWidget(props: AnnouncementsWidgetProps) {
         count={anns.length}
         onExpand={onExpand}
         onClose={onClose}
-        action={<PostAnnButton isFormOpen={postAnnsForm.composing} setFormOpen={postAnnsForm.setComposing} />}
+        action={<PostAnnButton isFormOpen={form.composing} setFormOpen={form.setComposing} />}
       />
 
-      {postAnnsForm.composing && (
-        <PostAnnForm
-          title={postAnnsForm.title}
-          setTitle={postAnnsForm.setTitle}
-          body={postAnnsForm.body}
-          setBody={postAnnsForm.setBody}
-          tag={postAnnsForm.tag}
-          setTag={postAnnsForm.setTag}
-          post={post}
-        />
-      )}
+      {form.composing && <PostAnnForm form={form} onPost={post} />}
 
-      <div>
-        {anns.length === 0 && (
-          <div
-            style={{
-              padding: "32px 20px",
-              textAlign: "center",
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 14,
-              color: "#1A1A1A",
-              opacity: 0.45,
-            }}>
-            You're all caught up — no announcements
-          </div>
-        )}
-        {anns.map((ann) => (
-          <AnnContent ann={ann} toggleAnnBody={toggleBody} deleteAnn={deleteAnn} openIds={openIds} />
-        ))}
-      </div>
+      {anns.length === 0 ? (
+        <div
+          style={{
+            padding: "32px 20px",
+            textAlign: "center",
+            fontFamily: "Helvetica, Arial, sans-serif",
+            fontSize: 14,
+            color: "#1A1A1A",
+            opacity: 0.45,
+          }}>
+          You're all caught up — no announcements
+        </div>
+      ) : (
+        anns.map((ann) => (
+          <AnnContent key={ann.id} ann={ann} openIds={openIds} toggleAnnBody={toggleBody} deleteAnn={deleteAnn} />
+        ))
+      )}
     </Card>
   );
 }

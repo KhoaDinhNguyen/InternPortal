@@ -1,16 +1,15 @@
 import type { Session, AuthChangeEvent, AuthError, AuthListener, User } from "./supabase.types";
-import type { MockUser } from "../features/login/types";
+import type { MockUser, Profile, UserRole } from "../features/login/types";
 import { MOCK_USERS } from "../features/login/mockData";
-import type { UserRole } from "../features/login/types";
 
 const STORAGE_KEY = "mock-supabase-session";
 const USERS_KEY = "mock-supabase-users";
 
 const listeners = new Set<AuthListener>();
 
-const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+export const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-function readSession(): Session | null {
+export function readSession(): Session | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : null;
@@ -19,7 +18,7 @@ function readSession(): Session | null {
   }
 }
 
-function writeSession(session: Session | null): void {
+export function writeSession(session: Session | null): void {
   try {
     if (session) localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
     else localStorage.removeItem(STORAGE_KEY)
@@ -31,7 +30,7 @@ function writeSession(session: Session | null): void {
 
 // Users live in localStorage (seeded from MOCK_USERS) so accounts created on /admin
 // survive reloads and are visible to other tabs — the admin page opens in its own tab.
-function readUsers(): MockUser[] {
+export function readUsers(): MockUser[] {
   try {
     const raw = localStorage.getItem(USERS_KEY);
     if (raw) return JSON.parse(raw);
@@ -41,7 +40,7 @@ function readUsers(): MockUser[] {
   return MOCK_USERS;
 }
 
-function writeUsers(users: MockUser[]): void {
+export function writeUsers(users: MockUser[]): void {
   try {
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
   } catch {
@@ -134,6 +133,28 @@ async function createUser({ email, password, role }: { email: string; password: 
   return { data: { user: toPublicUser(created) }, error: null };
 }
 
+/** Updates the signed-in user's own profile. Role is deliberately not editable here. */
+async function updateUser({ profile }: { profile: Profile }): Promise<UserResponse> {
+  await delay(300);
+
+  const session = readSession();
+  if (!session) return { data: { user: null }, error: { message: "Not signed in", status: 401 } };
+
+  const users = readUsers();
+  const target = users.find((u) => u.id === session.user.id);
+  if (!target) return { data: { user: null }, error: { message: "User not found", status: 404 } };
+
+  const updated: MockUser = { ...target, profile };
+  writeUsers(users.map((u) => (u.id === updated.id ? updated : u)));
+
+  const user = toPublicUser(updated);
+  const newSession: Session = { ...session, user };
+  writeSession(newSession);
+  notify("USER_UPDATED", newSession);
+
+  return { data: { user }, error: null };
+}
+
 async function updateUserById(id: string, attrs: Partial<Pick<User, "role" | "profile">>): Promise<UserResponse> {
   await delay(300);
   if (!isAdmin()) return { data: { user: null }, error: forbidden };
@@ -148,12 +169,30 @@ async function updateUserById(id: string, attrs: Partial<Pick<User, "role" | "pr
   return { data: { user: toPublicUser(updated) }, error: null };
 }
 
+/** Re-reads the signed-in user from the store, e.g. after an admin approved their profile change */
+async function refreshSession(): Promise<{ data: { session: Session | null }; error: null }> {
+  const session = readSession();
+  const stored = session && readUsers().find((u) => u.id === session.user.id);
+  if (!session || !stored) return { data: { session }, error: null };
+
+  const user = toPublicUser(stored);
+  if (JSON.stringify(user) === JSON.stringify(session.user)) return { data: { session }, error: null };
+
+  const newSession: Session = { ...session, user };
+  writeSession(newSession);
+  notify("USER_UPDATED", newSession);
+
+  return { data: { session: newSession }, error: null };
+}
+
 export const supabase = {
   auth: {
     signInWithPassword,
     signOut,
     getSession,
     getUser,
+    updateUser,
+    refreshSession,
     onAuthStateChange(callback: AuthListener) {
       listeners.add(callback);
 

@@ -6,6 +6,8 @@ const colorsBadge: Record<string, { bg: string; text: string }> = {
   Events: { bg: `${colors.TERTIARY}18`, text: colors.TERTIARY },
   Operations: { bg: `${colors.TERTIARY}18`, text: colors.TERTIARY },
   General: { bg: "#EBF4FF", text: "#1A1A1A" },
+  Approved: { bg: `${colors.SECONDARY}22`, text: colors.SECONDARY },
+  Rejected: { bg: "#FFEEEE", text: "#C0392B" },
 };
 
 export default function TagBadge({ label }: { label: string }) {

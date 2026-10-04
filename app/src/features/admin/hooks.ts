@@ -27,17 +27,21 @@ export function useAdminUsers() {
     return error;
   }
 
+  async function reload() {
+    const { data } = await loadUsers();
+    setUsers(data.users);
+  }
+
   async function setRole(id: string, role: UserRole) {
     setUsers((us) => us.map((u) => (u.id === id ? { ...u, role } : u)));
-
     const { error } = await supabase.auth.admin.updateUserById(id, { role });
 
     if (error) {
       setError(error.message);
-      const { data } = await loadUsers();
-      setUsers(data.users);
+      reload();
     }
   }
 
-  return { users, loading, error, createUser, setRole };
+  return { users, loading, error, createUser, setRole, reload };
+
 }

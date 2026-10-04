@@ -14,6 +14,8 @@ export default function ProtectedRoute({ redirectTo = "/login", allow }: Protect
 
   if (loading) return <p style={{ padding: "2rem" }}>Loading…</p>;
   if (!user) return <Navigate to={redirectTo} replace state={{ from: location }} />;
+  // First login: nothing else is reachable until the profile is filled in
+  if (!user.profile && location.pathname !== "/profile") return <Navigate to="/profile" replace />;
   if (allow && !(user.role && allow.includes(user.role))) return <Navigate to="/" replace />;
 
   return <Outlet />;

@@ -6,6 +6,9 @@ import { ROLE_LABELS, ROLE_COLORS } from "../login/mockData";
 import type { UserRole } from "../login/types";
 import { useAuth } from "../login/useAuth";
 import { useAdminUsers } from "./hooks";
+import ProfileRequestsCard from "../requests/components/ProfileRequestsCard";
+import { useProfileRequests } from "../requests/hooks";
+import type { ReviewDecision } from "../requests/types";
 
 const ROLE_OPTIONS: UserRole[] = ["intern", "northstar", "admin"];
 
@@ -46,7 +49,8 @@ const text = (fontSize: number, color = "#1A1A1A"): React.CSSProperties => ({
 
 export default function AdminPage() {
   const { user: me } = useAuth();
-  const { users, loading, error, createUser, setRole } = useAdminUsers();
+  const { users, loading, error, createUser, setRole, reload } = useAdminUsers();
+  const { requests, review, error: requestsError } = useProfileRequests();
 
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -70,6 +74,12 @@ export default function AdminPage() {
     setNewPassword("");
     setCreateError("");
     setTimeout(() => setCreateSuccess(""), 3000);
+  }
+
+  async function handleReview(id: string, decision: ReviewDecision, note?: string) {
+    const ok = await review(id, decision, note);
+    // Approval changed that user's profile; refresh the table below
+    if (ok && decision === "approved") await reload();
   }
 
   return (
@@ -143,6 +153,29 @@ export default function AdminPage() {
           }}>
           Admin
         </div>
+        <Link
+          to="/history"
+          style={{
+            ...text(14),
+            padding: "0 20px",
+            height: 44,
+            display: "flex",
+            alignItems: "center",
+            fontWeight: 500,
+            textDecoration: "none",
+            borderBottom: "2px solid transparent",
+            transition: "color 0.15s, border-color 0.15s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = colors.MAGENTA;
+            e.currentTarget.style.borderBottomColor = `${colors.MAGENTA}55`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "#1A1A1A";
+            e.currentTarget.style.borderBottomColor = "transparent";
+          }}>
+          Request History
+        </Link>
       </nav>
 
       <main
@@ -227,7 +260,11 @@ export default function AdminPage() {
             {createSuccess && <div style={{ ...text(13, "#22C55E"), marginTop: 10 }}>{createSuccess}</div>}
           </div>
         </div>
-
+        <ProfileRequestsCard
+          requests={requests.filter((r) => r.status === "pending")}
+          error={requestsError}
+          onReview={handleReview}
+        />
         {/* Users table */}
         <div style={card}>
           <div

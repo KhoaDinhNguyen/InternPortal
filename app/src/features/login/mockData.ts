@@ -17,14 +17,14 @@ export const MOCK_USERS: MockUser[] = [
     email: "maya@portal.com",
     password: "maya123",
     role: "intern",
-    profile: { name: "Maya R.", preferredName: "Maya", title: "Intern", phone: "" },
+    profile: null
   },
   {
     id: "8f1c2a4e-0004",
     email: "priya@portal.com",
     password: "priya123",
     role: "northstar",
-    profile: { name: "Priya K.", preferredName: "Priya", title: "Program Associate", phone: "" },
+    profile: null,
   },
 ];
 

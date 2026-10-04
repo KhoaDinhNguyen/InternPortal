@@ -22,6 +22,8 @@ import UserMenuButton from "@components/UserMenuButton";
 import { Link } from "react-router";
 import colors from "@styles/colors";
 import { useAuth } from "../features/login/useAuth";
+import { useNotifications } from "../features/requests/hooks";
+import type { Announcement } from "../features/announcements/types";
 
 type ExpandedPanel = "todo" | "calendar" | "announcements" | "links" | "docs" | "dms" | "hours" | null;
 
@@ -34,7 +36,18 @@ const text = (fontSize: number, color = "#1A1A1A"): React.CSSProperties => ({
 export default function DashboardPage() {
   const { user } = useAuth();
   const [expanded, setExpanded] = useState<ExpandedPanel>(null);
-  const { anns, pushAnn, openIds, toggleBody, deleteAnn } = useAnnouncements();
+  const { notifications, dismiss } = useNotifications();
+  const notices: Announcement[] = notifications.map((n) => ({
+    id: n.id,
+    title: n.title,
+    body: n.body,
+    date: new Date(n.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    tag: n.kind === "approved" ? "Approved" : "Rejected",
+    pinned: true,
+  }));
+
+  const annStore = useAnnouncements(notices, dismiss);
+
   const { entries, addEntries } = useHoursEntries();
   const {
     activeId,
@@ -155,14 +168,8 @@ export default function DashboardPage() {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 16, alignItems: "start" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <AnnouncementsWidget
-              onExpand={() => setExpanded("announcements")}
-              anns={anns}
-              pushAnn={pushAnn}
-              openIds={openIds}
-              toggleBody={toggleBody}
-              deleteAnn={deleteAnn}
-            />
+            <AnnouncementsWidget annStore={annStore} onExpand={() => setExpanded("announcements")} />
+
             <TodoWidget todoStore={todoStore} onExpand={() => setExpanded("todo")} />
             <HoursLogWidget entries={entries} addEntries={addEntries} onExpand={() => setExpanded("hours")} />
           </div>
@@ -191,14 +198,9 @@ export default function DashboardPage() {
       </main>
       {expanded === "announcements" && (
         <Modal onClose={() => setExpanded(null)}>
-          <AnnouncementsWidget
-            onClose={() => setExpanded(null)}
-            anns={anns}
-            pushAnn={pushAnn}
-            openIds={openIds}
-            toggleBody={toggleBody}
-            deleteAnn={deleteAnn}
-          />
+          <Modal onClose={() => setExpanded(null)}>
+            <AnnouncementsWidget annStore={annStore} onClose={() => setExpanded(null)} />
+          </Modal>
         </Modal>
       )}
 

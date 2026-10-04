@@ -5,6 +5,7 @@ import colors from "@styles/colors";
 import { ROLE_LABELS, ROLE_COLORS } from "../features/login/mockData";
 import { supabase } from "../lib/supabase";
 import type { User } from "../lib/supabase.types";
+import { useNavigate } from "react-router";
 
 interface UserMenuButtonProps {
   currentUser: User;
@@ -14,6 +15,7 @@ export default function UserMenuButton({ currentUser }: UserMenuButtonProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     function handler(e: MouseEvent) {
@@ -136,7 +138,7 @@ export default function UserMenuButton({ currentUser }: UserMenuButtonProps) {
               icon: "👤",
               action: () => {
                 setMenuOpen(false);
-                // onEditProfile();
+                navigate("/profile");
               },
             },
             ...(isAdmin
@@ -151,6 +153,14 @@ export default function UserMenuButton({ currentUser }: UserMenuButtonProps) {
                   },
                 ]
               : []),
+            {
+              label: "Request History",
+              icon: "📋",
+              action: () => {
+                setMenuOpen(false);
+                navigate("/history");
+              },
+            },
           ].map((item) => (
             <button
               key={item.label}
