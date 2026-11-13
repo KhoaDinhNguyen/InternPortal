@@ -1,4 +1,5 @@
-import colors from "@styles/colors";
+import { cn } from "@lib/cn";
+import { formPanelClass, inputClass, primaryButtonClass } from "@styles/ui";
 import DateDropdown from "./DateDropdown";
 import TimeDropdown from "./TimeDropdown";
 import { EVENT_COLORS } from "../mockData";
@@ -20,49 +21,7 @@ const FREQ_OPTIONS: { id: RepeatFreq; label: string }[] = [
 
 const END_OPTIONS: RepeatEnds[] = ["never", "on", "after"];
 
-const FIELD_BOX: React.CSSProperties = {
-  height: 40,
-  overflow: "hidden",
-  display: "flex",
-  alignItems: "center",
-  border: "1px solid #C8DCF0",
-  borderRadius: 8,
-  background: "#fff",
-};
-
-const LABEL: React.CSSProperties = {
-  fontFamily: "Helvetica, Arial, sans-serif",
-  fontSize: 12,
-  color: "#1A1A1A",
-  fontWeight: 600,
-  marginBottom: 4,
-};
-
-const TEXT: React.CSSProperties = {
-  fontFamily: "Helvetica, Arial, sans-serif",
-  fontSize: 13,
-  color: "#1A1A1A",
-};
-
-const SELECT: React.CSSProperties = {
-  padding: "7px 10px",
-  borderRadius: 7,
-  border: "1px solid #C8DCF0",
-  fontFamily: "Helvetica, Arial, sans-serif",
-  fontSize: 14,
-  color: "#1A1A1A",
-  background: "#fff",
-  outline: "none",
-  cursor: "pointer",
-  appearance: "none",
-  WebkitAppearance: "none",
-  backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%234A6B8A' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
-  backgroundRepeat: "no-repeat",
-  backgroundPosition: "right 10px center",
-  paddingRight: 28,
-  width: "100%",
-  boxSizing: "border-box",
-};
+const LABEL = "mb-1 text-xs font-semibold";
 
 /**
  * Renders the input form for a new event, includes:
@@ -74,45 +33,19 @@ const SELECT: React.CSSProperties = {
  */
 export default function NewEventForm({ form, post }: NewEventFormProps) {
   return (
-    <div
-      style={{
-        marginBottom: 10,
-        padding: 14,
-        borderRadius: 10,
-        background: colors.MAGENTA_LIGHT,
-        border: `1px solid ${colors.MAGENTA}33`,
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
-        boxSizing: "border-box",
-        width: "100%",
-        overflow: "hidden",
-      }}>
+    <div className={cn(formPanelClass, "mb-2.5 w-full gap-2.5 overflow-hidden")}>
       {/* Title */}
-      <div style={{ ...FIELD_BOX, width: "100%", borderRadius: 7 }}>
-        <input
-          value={form.title}
-          onChange={(e) => form.setTitle(e.target.value)}
-          placeholder="Event title…"
-          style={{
-            flex: 1,
-            width: "100%",
-            height: "100%",
-            padding: "0 10px",
-            border: "none",
-            outline: "none",
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            color: "#1A1A1A",
-            background: "transparent",
-          }}
-        />
-      </div>
+      <input
+        value={form.title}
+        onChange={(e) => form.setTitle(e.target.value)}
+        placeholder="Event title…"
+        className={cn(inputClass, "h-10 w-full py-0")}
+      />
 
       {/* Start */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <div style={LABEL}>Start</div>
-        <div style={{ display: "flex", gap: 6, minWidth: 0 }}>
+      <div className="flex flex-col">
+        <div className={LABEL}>Start</div>
+        <div className="flex min-w-0 gap-1.5">
           <DateDropdown
             month={form.startMonth}
             day={form.startDay}
@@ -128,9 +61,9 @@ export default function NewEventForm({ form, post }: NewEventFormProps) {
       </div>
 
       {/* End */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <div style={LABEL}>End</div>
-        <div style={{ display: "flex", gap: 6, minWidth: 0 }}>
+      <div className="flex flex-col">
+        <div className={LABEL}>End</div>
+        <div className="flex min-w-0 gap-1.5">
           <DateDropdown
             month={form.endMonth}
             day={form.endDay}
@@ -146,75 +79,40 @@ export default function NewEventForm({ form, post }: NewEventFormProps) {
       </div>
 
       {/* Repeat */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <div className="flex flex-col gap-1.5">
         <button
           onClick={() => form.setRepeat(!form.repeat)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            padding: 0,
-            width: "fit-content",
-          }}>
-          <div
-            style={{
-              width: 36,
-              height: 20,
-              borderRadius: 10,
-              background: form.repeat ? colors.MAGENTA : "#D0C0D0",
-              position: "relative",
-              transition: "background 0.2s",
-              flexShrink: 0,
-            }}>
-            <div
-              style={{
-                position: "absolute",
-                top: 2,
-                left: form.repeat ? 18 : 2,
-                width: 16,
-                height: 16,
-                borderRadius: "50%",
-                background: "#fff",
-                transition: "left 0.2s",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-              }}
+          role="switch"
+          aria-checked={form.repeat}
+          className="flex w-fit items-center gap-2">
+          {/* Toggle switch */}
+          <span
+            className={cn(
+              "relative h-5 w-9 shrink-0 rounded-full transition-colors",
+              form.repeat ? "bg-primary" : "bg-gray-300",
+            )}>
+            <span
+              className={cn(
+                "absolute top-0.5 size-4 rounded-full bg-white shadow-sm transition-all",
+                form.repeat ? "left-4.5" : "left-0.5",
+              )}
             />
-          </div>
-          <span style={{ ...TEXT, fontWeight: 600 }}>Repeat event</span>
+          </span>
+          <span className="text-caption font-semibold">Repeat event</span>
         </button>
 
         {form.repeat && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
-              padding: "10px 12px",
-              background: "#fff",
-              borderRadius: 8,
-              border: "1px solid #C8DCF0",
-            }}>
+          <div className="flex flex-col gap-2 rounded-lg border bg-white px-3 py-2.5">
             {/* Frequency */}
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            <div className="flex flex-wrap gap-1.5">
               {FREQ_OPTIONS.map((f) => (
                 <button
                   key={f.id}
                   onClick={() => form.setRepeatFreq(f.id)}
-                  style={{
-                    padding: "4px 12px",
-                    borderRadius: 20,
-                    border: `1.5px solid ${form.repeatFreq === f.id ? colors.MAGENTA : "#C8DCF0"}`,
-                    background: form.repeatFreq === f.id ? colors.MAGENTA_LIGHT : "transparent",
-                    color: form.repeatFreq === f.id ? colors.MAGENTA : "#1A1A1A",
-                    fontFamily: "Helvetica, Arial, sans-serif",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    transition: "all 0.12s",
-                  }}>
+                  className={cn(
+                    "rounded-full border px-3 py-1 text-xs font-semibold transition-colors",
+                    form.repeatFreq === f.id ? "border-primary bg-primary-light text-primary" : "hover:bg-hover",
+                  )}>
                   {f.label}
                 </button>
               ))}
@@ -222,55 +120,43 @@ export default function NewEventForm({ form, post }: NewEventFormProps) {
 
             {/* Ends */}
             <div>
-              <div style={{ ...LABEL, marginBottom: 6 }}>Ends</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <div className={cn(LABEL, "mb-1.5")}>Ends</div>
+              <div className="flex flex-col gap-1.5 text-caption">
                 {END_OPTIONS.map((opt) => (
-                  <div key={opt} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div key={opt} className="flex items-center gap-2">
+                    {/* Radio button */}
                     <button
                       onClick={() => form.setRepeatEnds(opt)}
                       title={`Ends ${opt}`}
-                      style={{
-                        width: 16,
-                        height: 16,
-                        padding: 0,
-                        borderRadius: "50%",
-                        border: `2px solid ${form.repeatEnds === opt ? colors.MAGENTA : "#C0B0C0"}`,
-                        background: form.repeatEnds === opt ? colors.MAGENTA : "transparent",
-                        flexShrink: 0,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                      }}>
-                      {form.repeatEnds === opt && (
-                        <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />
-                      )}
+                      className={cn(
+                        "flex size-4 shrink-0 items-center justify-center rounded-full border-2",
+                        form.repeatEnds === opt ? "border-primary bg-primary" : "border-gray-300",
+                      )}>
+                      {form.repeatEnds === opt && <span className="size-1.5 rounded-full bg-white" />}
                     </button>
 
-                    {opt === "never" && <span style={TEXT}>Never</span>}
+                    {opt === "never" && <span>Never</span>}
 
                     {opt === "on" && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1 }}>
-                        <span style={TEXT}>On</span>
-                        <div style={{ flex: 1 }}>
-                          <DateDropdown
-                            month={form.repeatEndMonth}
-                            day={form.repeatEndDay}
-                            year={form.repeatEndYear}
-                            onChange={(m, d, y) => {
-                              form.setRepeatEndMonth(m);
-                              form.setRepeatEndDay(d);
-                              form.setRepeatEndYear(y);
-                              form.setRepeatEnds("on");
-                            }}
-                          />
-                        </div>
+                      <div className="flex flex-1 items-center gap-1.5">
+                        <span>On</span>
+                        <DateDropdown
+                          month={form.repeatEndMonth}
+                          day={form.repeatEndDay}
+                          year={form.repeatEndYear}
+                          onChange={(m, d, y) => {
+                            form.setRepeatEndMonth(m);
+                            form.setRepeatEndDay(d);
+                            form.setRepeatEndYear(y);
+                            form.setRepeatEnds("on");
+                          }}
+                        />
                       </div>
                     )}
 
                     {opt === "after" && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <span style={TEXT}>After</span>
+                      <div className="flex items-center gap-1.5">
+                        <span>After</span>
                         <input
                           type="number"
                           min={1}
@@ -280,18 +166,9 @@ export default function NewEventForm({ form, post }: NewEventFormProps) {
                             form.setRepeatCount(Math.max(1, +e.target.value));
                             form.setRepeatEnds("after");
                           }}
-                          style={{
-                            width: 48,
-                            padding: "4px 6px",
-                            borderRadius: 6,
-                            border: "1px solid #C8DCF0",
-                            fontFamily: "Helvetica, Arial, sans-serif",
-                            fontSize: 13,
-                            outline: "none",
-                            textAlign: "center",
-                          }}
+                          className={cn(inputClass, "w-12 rounded-md px-1.5 py-1 text-center text-caption")}
                         />
-                        <span style={TEXT}>occurrences</span>
+                        <span>occurrences</span>
                       </div>
                     )}
                   </div>
@@ -303,31 +180,30 @@ export default function NewEventForm({ form, post }: NewEventFormProps) {
       </div>
 
       {/* Colour */}
-      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-        <span style={{ ...LABEL, marginBottom: 0, marginRight: 2 }}>Color</span>
+      <div className="flex items-center gap-1.5">
+        <span className={cn(LABEL, "mr-0.5 mb-0")}>Color</span>
         {EVENT_COLORS.map((c) => (
           <button
             key={c}
             onClick={() => form.setColor(c)}
             title={`Use ${c}`}
-            style={{
-              width: 20,
-              height: 20,
-              borderRadius: "50%",
-              background: c,
-              border: `2.5px solid ${form.color === c ? "#1A1A1A" : "transparent"}`,
-              cursor: "pointer",
-              flexShrink: 0,
-              transition: "border 0.1s",
-            }}
+            className={cn(
+              "size-5 shrink-0 rounded-full border-2 transition-colors",
+              form.color === c ? "border-ink" : "border-transparent",
+            )}
+            // Swatch colour comes from the event palette
+            style={{ background: c }}
           />
         ))}
       </div>
 
       {/* Share */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <div style={LABEL}>Also add to teammate's calendar</div>
-        <select value={form.shareWith} onChange={(e) => form.setShareWith(e.target.value)} style={SELECT}>
+      <div className="flex flex-col">
+        <div className={LABEL}>Also add to teammate's calendar</div>
+        <select
+          value={form.shareWith}
+          onChange={(e) => form.setShareWith(e.target.value)}
+          className={cn(inputClass, "w-full")}>
           <option value="">— None —</option>
           {TEAM_MEMBERS.filter((m) => m !== authUser).map((m) => (
             <option key={m} value={m}>
@@ -335,27 +211,10 @@ export default function NewEventForm({ form, post }: NewEventFormProps) {
             </option>
           ))}
         </select>
-        {form.shareWith && (
-          <div style={{ fontFamily: "Helvetica, Arial, sans-serif", fontSize: 12, color: colors.MAGENTA }}>
-            Event will be shared with {form.shareWith}
-          </div>
-        )}
+        {form.shareWith && <p className="mt-1 text-xs text-primary">Event will be shared with {form.shareWith}</p>}
       </div>
 
-      <button
-        onClick={post}
-        style={{
-          padding: "8px 0",
-          borderRadius: 8,
-          border: "none",
-          background: colors.MAGENTA,
-          color: "#fff",
-          fontFamily: "Helvetica, Arial, sans-serif",
-          fontSize: 14,
-          fontWeight: 600,
-          cursor: "pointer",
-          width: "100%",
-        }}>
+      <button onClick={post} className={cn(primaryButtonClass, "w-full")}>
         Save event
       </button>
     </div>

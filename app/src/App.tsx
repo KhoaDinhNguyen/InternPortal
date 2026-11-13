@@ -1,8 +1,11 @@
 import { Route, Routes } from "react-router";
-import "./App.css";
 import DashboardPage from "./pages/Dashboard";
+import HoursPage from "./pages/Hours";
 import LoginPage from "./pages/Login";
+import MessagesPage from "./pages/Messages";
+import OrganizationPage from "./pages/Organization";
 import ProtectedRoute from "@components/ProtectedRoute";
+import PortalLayout from "./layouts/PortalLayout";
 import AuthProvider from "./features/login/AuthProvider";
 import AdminPage from "./features/admin/AdminPage";
 import ProfilePage from "./features/profile/ProfilePage";
@@ -15,7 +18,14 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<DashboardPage />} />
+          {/* Pages with the sidebar */}
+          <Route element={<PortalLayout />}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/messages" element={<MessagesPage />} />
+            <Route path="/hours" element={<HoursPage />} />
+            <Route path="/organization" element={<OrganizationPage />} />
+          </Route>
+
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/history" element={<HistoryPage />} />
         </Route>

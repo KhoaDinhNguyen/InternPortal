@@ -3,36 +3,16 @@ interface ModalProps {
   children: React.ReactNode;
 }
 
+/** Centered dialog over a blurred backdrop; clicking the backdrop closes it */
 export default function Modal({ onClose, children }: ModalProps) {
   return (
     <div
       onClick={onClose}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(10,26,50,0.35)",
-        backdropFilter: "blur(4px)",
-        zIndex: 100,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 24,
-      }}>
+      className="fixed inset-0 z-100 flex items-center justify-center bg-slate-900/35 p-6 backdrop-blur-xs">
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{
-          background: "#fff",
-          borderRadius: 16,
-          border: "1px solid #C8DCF0",
-          width: "100%",
-          maxWidth: 760,
-          maxHeight: "85vh",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-          boxShadow: "0 24px 64px rgba(10,26,50,0.18)",
-        }}>
-        <div style={{ overflowY: "auto", flex: 1 }}>{children}</div>
+        className="flex max-h-full w-full max-w-3xl flex-col overflow-hidden rounded-2xl border bg-white shadow-2xl">
+        <div className="flex-1 overflow-y-auto">{children}</div>
       </div>
     </div>
   );

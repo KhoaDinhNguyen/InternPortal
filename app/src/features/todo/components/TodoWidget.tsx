@@ -33,7 +33,7 @@ export default function TodoWidget({ onExpand, onClose, todoStore }: TodoWidgetP
         onExpand={onExpand}
         onClose={onClose}
         action={
-          <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+          <div className="flex flex-wrap items-center gap-1">
             {filterConfigs.map((f) => (
               <FilterButton key={f.id} filter={filter} setFilter={setFilter} filterConfig={f} />
             ))}
@@ -43,18 +43,11 @@ export default function TodoWidget({ onExpand, onClose, todoStore }: TodoWidgetP
 
       {filteredTodos.some((t) => t.done) && <DismissCompleteButton dismiss={removeCompletedTodos} />}
 
-      <div style={{ maxHeight: 300, overflowY: "auto", padding: "0 20px" }}>
+      <div className="max-h-75 overflow-y-auto px-5">
         {filteredTodos.length === 0 ? (
-          <div
-            style={{
-              padding: "28px 0",
-              textAlign: "center",
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 16,
-              color: "#1A1A1A",
-            }}>
+          <p className="py-7 text-center">
             Nothing here — all clear!
-          </div>
+          </p>
         ) : (
           filteredTodos.map((todo) => (
             <TodoView key={todo.id} todo={todo} toggleComplete={toggle} authUser={authUser} />

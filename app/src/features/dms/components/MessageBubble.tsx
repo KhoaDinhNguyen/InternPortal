@@ -2,11 +2,10 @@ import { formatDmTime, senderDisplayName } from "../utils/dmFormat";
 import MessageReactions from "./MessageReactions";
 import MessageHoverActions from "./MessageHoverAction";
 import Avatar from "@icons/Avatar";
+import { cn } from "@lib/cn";
 
 import type { DmMessage } from "../types";
 import { DM_USERS } from "../mockData";
-
-import colors from "@styles/colors";
 
 interface MessageBubbleProps {
   authId: string;
@@ -43,61 +42,28 @@ export function MessageBubble({
     <div
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: isMine ? "flex-end" : "flex-start",
-        position: "relative",
-      }}>
+      className={cn("relative flex flex-col", isMine ? "items-end" : "items-start")}>
       {showName && (
-        <span
-          style={{
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 12,
-            fontWeight: 600,
-            color: "#1A1A1A",
-            marginBottom: 3,
-            marginLeft: 34,
-          }}>
-          {senderDisplayName(message.senderId, DM_USERS)}
-        </span>
+        <span className="mb-1 ml-8.5 text-xs font-semibold">{senderDisplayName(message.senderId, DM_USERS)}</span>
       )}
-      <div style={{ display: "flex", alignItems: "flex-end", gap: 6, flexDirection: isMine ? "row-reverse" : "row" }}>
+      <div className={cn("flex items-end gap-1.5", isMine && "flex-row-reverse")}>
         {!isMine && showAvatar ? (
           <Avatar name={senderDisplayName(message.senderId, DM_USERS)} size={26} />
         ) : (
-          <div style={{ width: 26 }} />
+          <div className="w-6.5" />
         )}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: isMine ? "flex-end" : "flex-start",
-            maxWidth: 340,
-          }}>
+        <div className={cn("flex max-w-85 flex-col", isMine ? "items-end" : "items-start")}>
           <div
-            style={{
-              padding: "9px 13px",
-              borderRadius: isMine ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
-              background: isMine ? colors.MAGENTA : "#D4E6F5",
-              color: isMine ? "#fff" : "#1A1A1A",
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 14,
-              lineHeight: 1.5,
-            }}>
-            {message.isDeleted ? <em style={{ opacity: 0.6 }}>Message deleted</em> : message.text}
-            {message.isEdited && !message.isDeleted && (
-              <span style={{ fontSize: 10, opacity: 0.6, marginLeft: 6 }}>(edited)</span>
-            )}
+            className={cn(
+              "rounded-2xl px-3.5 py-2 text-sm leading-normal",
+              isMine ? "rounded-br-sm bg-primary text-white" : "rounded-bl-sm bg-divider",
+            )}>
+            {message.isDeleted ? <em className="opacity-60">Message deleted</em> : message.text}
+            {message.isEdited && !message.isDeleted && <span className="ml-1.5 text-2xs opacity-60">(edited)</span>}
           </div>
           <MessageReactions authId={authId} reactions={message.reactions ?? []} onToggle={onToggleReaction} />
         </div>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-          <span style={{ fontFamily: "Helvetica, Arial, sans-serif", fontSize: 11, color: "#1A1A1A", flexShrink: 0 }}>
-            {formatDmTime(message.createdAt)}
-          </span>
-          {/* {isMine && <StatusTick status={message.status} />} */}
-        </div>
+        <span className="shrink-0 text-2xs">{formatDmTime(message.createdAt)}</span>
       </div>
 
       {isHovered && !message.isDeleted && (
@@ -106,12 +72,3 @@ export function MessageBubble({
     </div>
   );
 }
-
-// Re-add `MessageStatus` to the type import above when this is uncommented.
-// export function StatusTick({ status }: { status: MessageStatus }) {
-//   if (status === "sending") return <span style={{ fontSize: 10, color: "#aaa" }}>○</span>;
-//   if (status === "sent") return <span style={{ fontSize: 10, color: "#aaa" }}>✓</span>;
-//   if (status === "delivered") return <span style={{ fontSize: 10, color: "#aaa" }}>✓✓</span>;
-//   if (status === "read") return <span style={{ fontSize: 10, color: colors.MAGENTA }}>✓✓</span>;
-//   return null;
-// }

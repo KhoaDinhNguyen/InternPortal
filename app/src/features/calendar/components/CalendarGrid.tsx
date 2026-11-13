@@ -1,9 +1,6 @@
-import colors from "@styles/colors";
+import { cn } from "@lib/cn";
 import { DAYS } from "../mockData";
 import type { CalendarEvent, MonthCell } from "../types";
-
-/** Matches the grid width inside the 340px dashboard column */
-const GRID_MAX_WIDTH = 320;
 
 interface CalendarGridProps {
   cells: MonthCell[];
@@ -21,29 +18,19 @@ interface CalendarGridProps {
  */
 export default function CalendarGrid({ cells, events, selectedDay, selectDay, isCurrentMonth, today }: CalendarGridProps) {
   return (
-    <div style={{ padding: "0 16px 6px" }}>
-      {/* The day cells are square, so the grid is capped to the width it has on the
-          dashboard. Without the cap it scales with the card and the cells balloon
-          when the widget is expanded into the modal. */}
-      <div style={{ maxWidth: GRID_MAX_WIDTH, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", marginBottom: 4 }}>
+    <div className="px-4 pb-1.5">
+      {/* The day cells are square, so the grid is capped (max-w-80, the width it has
+          on the dashboard). Without the cap the cells balloon inside the modal. */}
+      <div className="mx-auto max-w-80">
+        <div className="mb-1 grid grid-cols-7">
           {DAYS.map((d) => (
-            <div
-              key={d}
-              style={{
-                textAlign: "center",
-                fontFamily: "Helvetica, Arial, sans-serif",
-                fontSize: 12,
-                color: "#1A1A1A",
-                letterSpacing: "0.06em",
-                padding: "2px 0",
-              }}>
+            <div key={d} className="py-0.5 text-center text-xs tracking-wider">
               {d}
             </div>
           ))}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px 0" }}>
+        <div className="grid grid-cols-7 gap-y-0.5">
           {cells.map((day, i) => {
             if (!day) return <div key={`pad-${i}`} />;
 
@@ -55,43 +42,21 @@ export default function CalendarGrid({ cells, events, selectedDay, selectDay, is
               <button
                 key={day}
                 onClick={() => selectDay(day)}
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  aspectRatio: "1",
-                  borderRadius: 7,
-                  border: "none",
-                  cursor: "pointer",
-                  background: isSelected ? colors.MAGENTA : isToday ? colors.MAGENTA_LIGHT : "transparent",
-                  color: isSelected ? "#fff" : isToday ? colors.MAGENTA : "#1A1A1A",
-                  fontFamily: "Helvetica, Arial, sans-serif",
-                  fontWeight: isToday ? 700 : 400,
-                  fontSize: 14,
-                  transition: "background 0.1s",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-                onMouseEnter={(e) => {
-                  if (!isSelected && !isToday) e.currentTarget.style.background = colors.MAGENTA_LIGHT;
-                }}
-                onMouseLeave={(e) => {
-                  if (!isSelected && !isToday) e.currentTarget.style.background = "transparent";
-                }}>
+                className={cn(
+                  "relative flex aspect-square w-full items-center justify-center rounded-md text-sm transition-colors",
+                  isSelected
+                    ? "bg-primary text-white"
+                    : isToday
+                      ? "bg-primary-light font-bold text-primary"
+                      : "hover:bg-primary-light",
+                )}>
                 {day}
                 {hasEvent && (
                   <span
-                    style={{
-                      position: "absolute",
-                      bottom: 3,
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      width: 4,
-                      height: 4,
-                      borderRadius: "50%",
-                      background: isSelected ? "rgba(255,255,255,0.7)" : colors.MAGENTA,
-                    }}
+                    className={cn(
+                      "absolute bottom-1 left-1/2 size-1 -translate-x-1/2 rounded-full",
+                      isSelected ? "bg-white/70" : "bg-primary",
+                    )}
                   />
                 )}
               </button>

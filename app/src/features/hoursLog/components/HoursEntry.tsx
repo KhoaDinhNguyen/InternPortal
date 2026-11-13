@@ -1,5 +1,4 @@
 import type { HourEntry } from "../types";
-import colors from "@styles/colors";
 
 /**
  * Renders information for each log, include
@@ -9,61 +8,14 @@ import colors from "@styles/colors";
  */
 export default function HoursEntry({ entry }: { entry: HourEntry }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        padding: "7px 10px",
-        borderRadius: 8,
-        background: "#F9F9F9",
-      }}>
-      {/** Log hours */}
-      <div
-        style={{
-          width: 28,
-          height: 28,
-          borderRadius: 7,
-          background: colors.MAGENTA_LIGHT,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-        }}>
-        <span
-          style={{
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 12,
-            color: colors.MAGENTA,
-            fontWeight: 700,
-          }}>
-          {entry.hours}h
-        </span>
+    <div className="flex items-center gap-2.5 rounded-lg bg-neutral-50 px-2.5 py-1.5">
+      <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary-light text-xs font-bold text-primary">
+        {entry.hours}h
       </div>
 
-      {/** Log description + project */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            fontWeight: 500,
-            color: "#1A1A1A",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}>
-          {entry.description}
-        </div>
-        <div
-          style={{
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 12,
-            color: "#1A1A1A",
-            marginTop: 1,
-          }}>
-          {entry.project}
-        </div>
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-sm font-medium">{entry.description}</div>
+        <div className="mt-px text-xs">{entry.project}</div>
       </div>
     </div>
   );

@@ -1,31 +1,41 @@
-import { useState } from "react";
-import type { HourEntry } from "../types";
-import { TODAY, thisWeek } from "../mockData";
+import type { HoursStore } from "../types";
+import { useHoursWeek } from "../hooks";
 import Card from "@components/Card";
 import CardHeader from "@components/CardHeader";
-import colors from "@styles/colors";
 import PostHoursLog from "./PostHoursLog";
 import HoursBar from "./HoursBar";
 import HoursEntry from "./HoursEntry";
+import WeekNavigator from "./WeekNavigator";
+import WeeklyRequirement, { ThursdayReminder } from "./WeeklyRequirement";
 
 /** Renders hours log tab, include
- * - Hours bar of this week
+ * - Weekly requirement progress (+ a late-week reminder)
+ * - Week navigation and the hours bar of the selected week
  * - Display the hours log of selected day
  * - Add new log
  */
 interface HoursLogWidgetProps {
-  entries: HourEntry[];
-  addEntries: (description: string, hours: string, project: string, viewDate: string) => boolean;
+  hoursStore: HoursStore;
+  /** Admins can change the weekly hours target */
+  canSetRequirement?: boolean;
   onExpand?: () => void;
   onClose?: () => void;
 }
 
-export default function HoursLogWidget({ entries, addEntries, onExpand, onClose }: HoursLogWidgetProps) {
-  const [viewDate, setViewDate] = useState(TODAY);
+export default function HoursLogWidget({ hoursStore, canSetRequirement = false, onExpand, onClose }: HoursLogWidgetProps) {
+  const { entries, addEntries, weeklyRequirement, setWeeklyRequirement } = hoursStore;
+  const { selectedWeek, isCurrentWeek, viewDate, setViewDate, moveWeek } = useHoursWeek();
 
-  const todayEntries = entries.filter((e) => e.date === viewDate);
-  const todayTotal = todayEntries.reduce((s, e) => s + e.hours, 0);
-  const weekTotal = entries.filter((e) => thisWeek.includes(e.date)).reduce((s, e) => s + e.hours, 0);
+  const dayEntries = entries.filter((e) => e.date === viewDate);
+  const dayTotal = dayEntries.reduce((s, e) => s + e.hours, 0);
+  const weekTotal = entries.filter((e) => selectedWeek.includes(e.date)).reduce((s, e) => s + e.hours, 0);
+  const allTimeTotal = entries.reduce((s, e) => s + e.hours, 0);
+  const throughSelectedDay = entries.filter((e) => e.date <= viewDate).reduce((s, e) => s + e.hours, 0);
+
+  const hoursRemaining = Math.max(weeklyRequirement - weekTotal, 0);
+  // Thursday through Saturday of the current week, while the target isn't met yet
+  const weekday = new Date().getDay();
+  const showReminder = weekday >= 4 && weekday <= 6 && isCurrentWeek && hoursRemaining > 0;
 
   function logHours(description: string, hours: string, project: string) {
     return addEntries(description, hours, project, viewDate);
@@ -38,64 +48,53 @@ export default function HoursLogWidget({ entries, addEntries, onExpand, onClose 
         onExpand={onExpand}
         onClose={onClose}
         action={
-          <span
-            style={{
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 12,
-              color: colors.MAGENTA,
-              fontWeight: 600,
-            }}>
-            {weekTotal.toFixed(1)}h this week
-          </span>
+          <div className="flex flex-col items-end">
+            <span className="text-xs font-bold text-primary">{weekTotal.toFixed(1)}h this week</span>
+            <span className="text-2xs text-muted">{allTimeTotal.toFixed(1)}h total</span>
+          </div>
         }
       />
 
-      <HoursBar entries={entries} viewDate={viewDate} setViewDate={setViewDate} />
+      <WeeklyRequirement
+        weekTotal={weekTotal}
+        requirement={weeklyRequirement}
+        canSetRequirement={canSetRequirement}
+        setRequirement={setWeeklyRequirement}
+      />
+
+      {showReminder && <ThursdayReminder remaining={hoursRemaining} requirement={weeklyRequirement} />}
+
+      <WeekNavigator week={selectedWeek} isCurrentWeek={isCurrentWeek} moveWeek={moveWeek} />
+
+      <HoursBar entries={entries} week={selectedWeek} viewDate={viewDate} setViewDate={setViewDate} />
 
       {/* Selected day entries */}
-      <div style={{ borderTop: "1px solid #D4E6F5", padding: "10px 20px 0" }}>
+      <div className="border-t border-divider px-5 pt-2.5">
         {/** Date display + number of hours  */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-          <span
-            style={{
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 12,
-              color: "#1A1A1A",
-              letterSpacing: "0.06em",
-            }}>
+        <div className="mb-2 flex items-center justify-between text-xs">
+          <span className="tracking-wider">
             {new Date(viewDate + "T12:00:00")
               .toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })
               .toUpperCase()}
           </span>
-          <span
-            style={{
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 12,
-              color: colors.MAGENTA,
-              fontWeight: 600,
-            }}>
-            {todayTotal.toFixed(1)}h
-          </span>
+          <span className="font-semibold text-primary">{dayTotal.toFixed(1)}h</span>
         </div>
 
-        {!todayEntries.length ? (
-          <div
-            style={{
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 14,
-              color: "#1A1A1A",
-              padding: "8px 0 12px",
-              textAlign: "center",
-            }}>
-            No hours logged for this day
-          </div>
+        {!dayEntries.length ? (
+          <p className="pt-2 pb-3 text-center text-sm">No hours logged for this day</p>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 2, marginBottom: 12 }}>
-            {todayEntries.map((e) => (
+          <div className="mb-3 flex flex-col gap-0.5">
+            {dayEntries.map((e) => (
               <HoursEntry entry={e} key={e.id} />
             ))}
           </div>
         )}
+
+        {/** Running total up to and including the selected day */}
+        <div className="flex justify-between gap-2.5 border-t border-divider pt-2 pb-3 text-xs text-muted">
+          <span>Total through this day</span>
+          <strong className="text-primary">{throughSelectedDay.toFixed(1)}h logged to date</strong>
+        </div>
       </div>
 
       <PostHoursLog logHours={logHours} />

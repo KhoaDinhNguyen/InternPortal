@@ -1,19 +1,24 @@
-import colors from "@styles/colors";
+import { cn } from "@lib/cn";
 import type { HourEntry } from "../types";
-import { thisWeek, DAY_LABELS, TODAY } from "../mockData";
+import { DAY_LABELS, TODAY } from "../mockData";
 
 interface HoursBarProps {
   entries: HourEntry[];
+  /** Monday–Friday date keys of the week in view */
+  week: string[];
   viewDate: string;
   setViewDate: (d: string) => void;
 }
 
+/** Height of the tallest bar, in px */
+const BAR_HEIGHT = 40;
+
 /**
- * Renders bar column for numbers of hours in the current week
+ * Renders bar column for numbers of hours in the selected week
  * - Each bar is also a button to select the `viewDate`
  */
-export default function HoursBar({ entries, viewDate, setViewDate }: HoursBarProps) {
-  const weekBars = thisWeek.map((date, i) => {
+export default function HoursBar({ entries, week, viewDate, setViewDate }: HoursBarProps) {
+  const weekBars = week.map((date, i) => {
     const total = entries.filter((e) => e.date === date).reduce((s, e) => s + e.hours, 0);
     return { date, label: DAY_LABELS[i] ?? "—", total, isToday: date === TODAY, isSelected: date === viewDate };
   });
@@ -21,40 +26,20 @@ export default function HoursBar({ entries, viewDate, setViewDate }: HoursBarPro
   const maxBar = Math.max(...weekBars.map((b) => b.total), 8);
 
   return (
-    <div style={{ padding: "0 20px 14px", display: "flex", gap: 6, alignItems: "flex-end", height: 64 }}>
+    <div className="flex items-end gap-1.5 px-5 pb-3.5">
       {weekBars.map((bar) => (
-        <button
-          key={bar.date}
-          onClick={() => setViewDate(bar.date)}
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 4,
-            border: "none",
-            background: "transparent",
-            cursor: "pointer",
-            padding: 0,
-          }}>
-          <div style={{ width: "100%", position: "relative", display: "flex", alignItems: "flex-end", height: 40 }}>
+        <button key={bar.date} onClick={() => setViewDate(bar.date)} className="flex flex-1 flex-col items-center gap-1">
+          <div className="flex h-10 w-full items-end">
             <div
-              style={{
-                width: "100%",
-                borderRadius: "4px 4px 0 0",
-                height: bar.total > 0 ? `${Math.round((bar.total / maxBar) * 40)}px` : "3px",
-                background: bar.isSelected ? colors.MAGENTA : bar.isToday ? colors.MAGENTA + "55" : "#C8DCF0",
-                transition: "height 0.2s, background 0.15s",
-              }}
+              className={cn(
+                "w-full rounded-t transition-all",
+                bar.isSelected ? "bg-primary" : bar.isToday ? "bg-primary/35" : "bg-line",
+              )}
+              // Bar height is proportional to the hours logged that day
+              style={{ height: bar.total > 0 ? Math.round((bar.total / maxBar) * BAR_HEIGHT) : 3 }}
             />
           </div>
-          <span
-            style={{
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 12,
-              color: bar.isSelected ? colors.MAGENTA : "#1A1A1A",
-              fontWeight: bar.isToday ? 700 : 400,
-            }}>
+          <span className={cn("text-xs", bar.isSelected && "text-primary", bar.isToday && "font-bold")}>
             {bar.label}
           </span>
         </button>

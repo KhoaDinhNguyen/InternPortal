@@ -1,4 +1,3 @@
-import colors from "@styles/colors";
 import type { Profile } from "../login/types";
 import type { ProfileUpdateRequest, RequestStatus } from "./types";
 
@@ -15,8 +14,9 @@ export const changedFields = (req: ProfileUpdateRequest) =>
 export const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
-export const STATUS_META: Record<RequestStatus, { label: string; bg: string; text: string }> = {
-  pending: { label: "PENDING", bg: `${colors.MAGENTA}18`, text: colors.MAGENTA },
-  approved: { label: "APPROVED", bg: `${colors.SECONDARY}18`, text: colors.SECONDARY },
-  rejected: { label: "REJECTED", bg: "#FFEEEE", text: "#C0392B" },
+/** Label and pill classes per request status */
+export const STATUS_META: Record<RequestStatus, { label: string; className: string }> = {
+  pending: { label: "PENDING", className: "bg-primary/10 text-primary" },
+  approved: { label: "APPROVED", className: "bg-secondary/10 text-secondary" },
+  rejected: { label: "REJECTED", className: "bg-red-50 text-danger" },
 };

@@ -1,16 +1,4 @@
+/** Green presence dot; place inside a `relative` avatar wrapper */
 export default function OnlineDot() {
-  return (
-    <span
-      style={{
-        position: "absolute",
-        bottom: 1,
-        right: 1,
-        width: 9,
-        height: 9,
-        background: "#22C55E",
-        borderRadius: "50%",
-        border: "2px solid #fff",
-      }}
-    />
-  );
+  return <span className="absolute right-px bottom-px size-2.5 rounded-full border-2 border-white bg-green-500" />;
 }

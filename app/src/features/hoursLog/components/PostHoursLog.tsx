@@ -1,4 +1,5 @@
-import colors from "@styles/colors";
+import { cn } from "@lib/cn";
+import { inputClass, primaryButtonClass } from "@styles/ui";
 import { usePostHoursLog } from "../hooks";
 import { PROJECTS } from "../mockData";
 
@@ -23,32 +24,14 @@ export default function PostHoursLog({ logHours }: PostHoursLogProps) {
   };
 
   return (
-    <div
-      style={{
-        padding: "12px 20px 18px",
-        borderTop: "1px solid #D4E6F5",
-        background: "#F9F9F9",
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-      }}>
-      <div style={{ display: "flex", gap: 8 }}>
+    <div className="flex flex-col gap-2 border-t border-divider bg-neutral-50 px-5 pt-3 pb-4.5">
+      <div className="flex gap-2">
         <input
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && post()}
           placeholder="What did you work on?"
-          style={{
-            flex: 1,
-            padding: "8px 12px",
-            borderRadius: 8,
-            border: "1.5px solid #C8DCF0",
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            color: "#1A1A1A",
-            outline: "none",
-            background: "#fff",
-          }}
+          className={cn(inputClass, "min-w-0 flex-1")}
         />
         <input
           value={hours}
@@ -59,57 +42,16 @@ export default function PostHoursLog({ logHours }: PostHoursLogProps) {
           min="0.25"
           max="12"
           step="0.25"
-          style={{
-            width: 60,
-            padding: "8px 10px",
-            borderRadius: 8,
-            border: "1.5px solid #C8DCF0",
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            color: "#1A1A1A",
-            outline: "none",
-            background: "#fff",
-            textAlign: "center",
-          }}
+          className={cn(inputClass, "w-15 px-2.5 text-center")}
         />
       </div>
-      <div style={{ display: "flex", gap: 8 }}>
-        <select
-          value={project}
-          onChange={(e) => setProject(e.target.value)}
-          style={{
-            flex: 1,
-            padding: "7px 10px",
-            borderRadius: 8,
-            border: "1.5px solid #C8DCF0",
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            color: "#1A1A1A",
-            outline: "none",
-            background: "#fff",
-            cursor: "pointer",
-          }}>
+      <div className="flex gap-2">
+        <select value={project} onChange={(e) => setProject(e.target.value)} className={cn(inputClass, "flex-1")}>
           {PROJECTS.map((p) => (
             <option key={p}>{p}</option>
           ))}
         </select>
-        <button
-          onClick={post}
-          style={{
-            padding: "7px 18px",
-            borderRadius: 8,
-            border: "none",
-            background: colors.MAGENTA,
-            color: "#fff",
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: "pointer",
-            transition: "background 0.15s",
-            whiteSpace: "nowrap",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = colors.MAGENTA_DARK)}
-          onMouseLeave={(e) => (e.currentTarget.style.background = colors.MAGENTA)}>
+        <button onClick={post} className={cn(primaryButtonClass, "px-4.5")}>
           Log
         </button>
       </div>

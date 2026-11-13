@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import colors from "@styles/colors";
+import { cn } from "@lib/cn";
+import { pickerFieldClass } from "@styles/ui";
 import { buildFullCalendar } from "../hooks";
 import { MONTHS } from "../mockData";
 
@@ -14,21 +15,7 @@ interface DateDropdownProps {
 const POPUP_H = 310;
 const POPUP_W = 272;
 
-const NAV_BTN: React.CSSProperties = {
-  width: 26,
-  height: 26,
-  borderRadius: 6,
-  border: "none",
-  background: "transparent",
-  cursor: "pointer",
-  fontFamily: "Helvetica, Arial, sans-serif",
-  fontSize: 15,
-  color: "#1A1A1A",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  flexShrink: 0,
-};
+const NAV_BTN = "flex size-6.5 shrink-0 items-center justify-center rounded-md hover:bg-primary-light";
 
 /**
  * Renders a date field that opens a month picker, includes:
@@ -101,58 +88,40 @@ export default function DateDropdown({ month, day, year, onChange }: DateDropdow
   const popup = open ? (
     <div
       id="date-dropdown-popup"
-      style={{
-        position: "absolute",
-        top: popupPos.top,
-        left: popupPos.left,
-        zIndex: 9999,
-        background: "#fff",
-        border: "1px solid #C8DCF0",
-        borderRadius: 12,
-        boxShadow: "0 8px 28px rgba(0,0,0,0.13)",
-        padding: "14px 14px 12px",
-        width: POPUP_W,
-      }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <div style={{ display: "flex", gap: 1 }}>
-          <button onClick={() => setCalYear((y) => y - 1)} title="Previous year" style={NAV_BTN}>
+      className="absolute z-9999 w-68 rounded-xl border bg-white px-3.5 pt-3.5 pb-3 shadow-xl"
+      // Position is measured from the trigger at open time
+      style={{ top: popupPos.top, left: popupPos.left }}>
+      <div className="mb-2.5 flex items-center justify-between">
+        <div className="flex gap-px">
+          <button onClick={() => setCalYear((y) => y - 1)} title="Previous year" className={NAV_BTN}>
             «
           </button>
-          <button onClick={() => stepMonth(-1)} title="Previous month" style={NAV_BTN}>
+          <button onClick={() => stepMonth(-1)} title="Previous month" className={NAV_BTN}>
             ‹
           </button>
         </div>
-        <span style={{ fontFamily: "Helvetica, Arial, sans-serif", fontWeight: 700, fontSize: 14, color: "#1A1A1A" }}>
+        <span className="text-sm font-bold">
           {MONTHS[calMonth]} {calYear}
         </span>
-        <div style={{ display: "flex", gap: 1 }}>
-          <button onClick={() => stepMonth(1)} title="Next month" style={NAV_BTN}>
+        <div className="flex gap-px">
+          <button onClick={() => stepMonth(1)} title="Next month" className={NAV_BTN}>
             ›
           </button>
-          <button onClick={() => setCalYear((y) => y + 1)} title="Next year" style={NAV_BTN}>
+          <button onClick={() => setCalYear((y) => y + 1)} title="Next year" className={NAV_BTN}>
             »
           </button>
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", marginBottom: 4 }}>
+      <div className="mb-1 grid grid-cols-7">
         {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
-          <div
-            key={i}
-            style={{
-              textAlign: "center",
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 11,
-              color: "#1A1A1A",
-              fontWeight: 500,
-              padding: "2px 0",
-            }}>
+          <div key={i} className="py-0.5 text-center text-2xs font-medium">
             {d}
           </div>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px 0" }}>
+      <div className="grid grid-cols-7 gap-y-0.5">
         {cells.map((cell) => {
           const isToday =
             cell.day === today.getDate() && cell.month === today.getMonth() && cell.year === today.getFullYear();
@@ -165,28 +134,12 @@ export default function DateDropdown({ month, day, year, onChange }: DateDropdow
                 onChange(cell.month, cell.day, cell.year);
                 setOpen(false);
               }}
-              style={{
-                width: "100%",
-                aspectRatio: "1",
-                borderRadius: "50%",
-                border: isToday && !isSelected ? `1.5px solid ${colors.MAGENTA}` : "1.5px solid transparent",
-                background: isSelected ? colors.MAGENTA : "transparent",
-                color: isSelected ? "#fff" : cell.current ? "#1A1A1A" : "#C0B0C0",
-                fontFamily: "Helvetica, Arial, sans-serif",
-                fontSize: 13,
-                fontWeight: isToday || isSelected ? 700 : 400,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "background 0.1s",
-              }}
-              onMouseEnter={(e) => {
-                if (!isSelected) e.currentTarget.style.background = colors.MAGENTA_LIGHT;
-              }}
-              onMouseLeave={(e) => {
-                if (!isSelected) e.currentTarget.style.background = "transparent";
-              }}>
+              className={cn(
+                "flex aspect-square w-full items-center justify-center rounded-full border-2 text-caption transition-colors",
+                isSelected ? "border-transparent bg-primary font-bold text-white" : "hover:bg-primary-light",
+                !isSelected && (isToday ? "border-primary font-bold" : "border-transparent"),
+                !isSelected && !cell.current && "text-gray-400",
+              )}>
               {cell.day}
             </button>
           );
@@ -196,33 +149,12 @@ export default function DateDropdown({ month, day, year, onChange }: DateDropdow
   ) : null;
 
   return (
-    <div style={{ position: "relative", flex: 1 }}>
-      <div
-        style={{
-          height: 40,
-          overflow: "hidden",
-          display: "flex",
-          alignItems: "center",
-          border: `1px solid ${open ? colors.MAGENTA : "#C8DCF0"}`,
-          borderRadius: 8,
-          background: "#fff",
-          transition: "border-color 0.15s",
-        }}>
+    <div className="relative min-w-0 flex-1">
+      <div className={pickerFieldClass(open)}>
         <button
           ref={triggerRef}
           onClick={() => (open ? setOpen(false) : openCal())}
-          style={{
-            flex: 1,
-            height: "100%",
-            padding: "0 12px",
-            border: "none",
-            background: "transparent",
-            cursor: "pointer",
-            textAlign: "left",
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            color: "#1A1A1A",
-          }}>
+          className="h-full flex-1 px-3 text-left text-sm">
           {displayDate}
         </button>
       </div>

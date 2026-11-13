@@ -8,7 +8,7 @@ interface ThreadPanelProps {
   active: DmConversation | null;
   name: string;
   otherUser: DmUser | null;
-  // onToggleMute: () => void;
+  onToggleMute: () => void;
   onTogglePin: () => void;
   hoveredId: string | null;
   handlersFor: (id: string) => { onMouseEnter: () => void; onMouseLeave: () => void };
@@ -31,7 +31,7 @@ export default function ThreadPanel({
   active,
   name,
   otherUser,
-  // onToggleMute,
+  onToggleMute,
   onTogglePin,
   hoveredId,
   handlersFor,
@@ -47,23 +47,21 @@ export default function ThreadPanel({
 }: ThreadPanelProps) {
   if (!active)
     return (
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 32, marginBottom: 10 }}>💬</div>
-          <div style={{ fontFamily: "Helvetica, Arial, sans-serif", fontSize: 16, color: "#1A1A1A" }}>
-            Select a conversation
-          </div>
+      <div className="flex flex-1 items-center justify-center text-center">
+        <div>
+          <div className="mb-2.5 text-3xl">💬</div>
+          <p>Select a conversation</p>
         </div>
       </div>
     );
 
   return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+    <div className="flex min-w-0 flex-1 flex-col">
       <ThreadHeader
         convo={active}
         name={name}
         otherUser={otherUser}
-        // onToggleMute={onToggleMute}
+        onToggleMute={onToggleMute}
         onTogglePin={onTogglePin}
       />
       <MessageList
