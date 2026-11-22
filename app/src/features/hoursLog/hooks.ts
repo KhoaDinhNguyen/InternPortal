@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { internConfigApi } from "../../lib/internConfigApi";
 import type { HourEntry, HoursStore } from "./types";
 import { DEFAULT_WEEKLY_REQUIREMENT, INITIAL_HOURS, TODAY } from "./mockData";
 import { getWeekDates } from "./utils";
@@ -6,11 +7,15 @@ import { getWeekDates } from "./utils";
 /** `useHoursEntries` controls all hours log entries, include
  * - A list of entries
  * - Add function
- * - The weekly hours requirement (editable by admins)
+ * - The signed-in user's weekly hours requirement (set by admins on Intern Configuration)
  */
 export function useHoursEntries(): HoursStore {
   const [entries, setEntries] = useState<HourEntry[]>(INITIAL_HOURS);
-  const [weeklyRequirement, setRequirement] = useState(DEFAULT_WEEKLY_REQUIREMENT);
+  const [weeklyRequirement, setWeeklyRequirement] = useState(DEFAULT_WEEKLY_REQUIREMENT);
+
+  useEffect(() => {
+    internConfigApi.getMyWeeklyHours().then(({ data }) => setWeeklyRequirement(data));
+  }, []);
 
   function addEntries(description: string, hours: string, project: string, viewDate: string): boolean {
     const h = parseFloat(hours);
@@ -21,12 +26,7 @@ export function useHoursEntries(): HoursStore {
     return true;
   }
 
-  /** Clamps to a non-negative number of hours */
-  function setWeeklyRequirement(hours: number) {
-    setRequirement(Math.max(0, Number.isFinite(hours) ? hours : 0));
-  }
-
-  return { entries, addEntries, weeklyRequirement, setWeeklyRequirement };
+  return { entries, addEntries, weeklyRequirement };
 }
 
 /**

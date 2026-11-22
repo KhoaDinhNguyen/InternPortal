@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useLocation } from "react-router";
+import { Navigate, Outlet, useLocation, useOutletContext } from "react-router";
 import { useAuth } from "../features/login/useAuth";
 import type { UserRole } from "../features/login/types";
 
@@ -11,6 +11,8 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({ redirectTo = "/login", allow }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
   const location = useLocation();
+  // Pass the parent's outlet context through when this guard sits inside a layout
+  const context = useOutletContext();
 
   if (loading) return <p className="p-8">Loading…</p>;
   if (!user) return <Navigate to={redirectTo} replace state={{ from: location }} />;
@@ -18,5 +20,5 @@ export default function ProtectedRoute({ redirectTo = "/login", allow }: Protect
   if (!user.profile && location.pathname !== "/profile") return <Navigate to="/profile" replace />;
   if (allow && !(user.role && allow.includes(user.role))) return <Navigate to="/" replace />;
 
-  return <Outlet />;
+  return <Outlet context={context} />;
 }

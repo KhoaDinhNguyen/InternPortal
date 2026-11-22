@@ -10,6 +10,6 @@ export interface HourEntry {
 export interface HoursStore {
   entries: HourEntry[],
   addEntries: (description: string, hours: string, project: string, viewDate: string) => boolean,
-  weeklyRequirement: number,
-  setWeeklyRequirement: (hours: number) => void
+  /** Hours per week the signed-in user must log; admins set it per intern */
+  weeklyRequirement: number
 }

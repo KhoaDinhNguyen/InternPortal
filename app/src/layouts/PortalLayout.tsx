@@ -17,12 +17,16 @@ export default function PortalLayout() {
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
-      <PortalSidebar isAdmin={user.role === "admin"} unreadMessages={stores.dms.totalUnread} />
+      <PortalSidebar
+        isAdmin={user.role === "admin"}
+        unreadMessages={stores.dms.totalUnread}
+        openTickets={stores.tickets.openCount}
+      />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <PortalHeader user={user} />
         {/* flex column so a page can fill the remaining height with flex-1 (Messages does) */}
-        <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-5 md:px-8 md:py-7">
+        <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-2 py-4">
           <Outlet context={stores} />
         </main>
       </div>

@@ -55,9 +55,7 @@ function ProfileForm({ user }: { user: User }) {
 
     setSaving(true);
 
-    const { error } = needsApproval
-      ? await requestsApi.submitProfileUpdate(profile)
-      : await supabase.auth.updateUser({ profile });
+    const { error } = needsApproval ? await requestsApi.submitProfileUpdate(profile) : await supabase.auth.updateUser({ profile });
 
     setSaving(false);
 
@@ -72,19 +70,9 @@ function ProfileForm({ user }: { user: User }) {
     navigate("/", { replace: true });
   }
 
-  const backLink = isEditing && (
-    <button
-      type="button"
-      onClick={() => navigate("/")}
-      className="mb-5 text-caption font-semibold text-primary hover:opacity-70">
-      ← Back to Dashboard
-    </button>
-  );
-
   return (
     <CenteredCardLayout
       widthClass="max-w-120"
-      top={backLink}
       title={needsApproval ? "Update Your Profile" : isEditing ? "Edit Your Profile" : "Complete Your Profile"}
       subtitle={
         needsApproval
@@ -96,10 +84,7 @@ function ProfileForm({ user }: { user: User }) {
       <form onSubmit={submit} className="flex flex-col gap-4.5">
         {/* Role display (read-only) */}
         <div
-          className={cn(
-            "flex items-center gap-2.5 rounded-lg px-3.5 py-2.5",
-            user.role ? ROLE_BADGE_CLASSES[user.role] : "bg-neutral-100 text-neutral-500",
-          )}>
+          className={cn("flex items-center gap-2.5 rounded-lg px-3.5 py-2.5", user.role ? ROLE_BADGE_CLASSES[user.role] : "bg-neutral-100 text-neutral-500")}>
           <span className="text-xs font-semibold tracking-wider">YOUR ROLE</span>
           <span className="text-sm font-bold">{user.role ? ROLE_LABELS[user.role] : "—"}</span>
           <span className="ml-auto text-2xs text-subtle">Set by administrator</span>
@@ -178,13 +163,7 @@ function ProfileForm({ user }: { user: User }) {
           </div>
         ) : (
           <button type="submit" disabled={saving} className={cn(primaryButtonClass, "w-full py-2.5 font-bold")}>
-            {saving
-              ? "Saving…"
-              : needsApproval
-                ? "Submit for Approval →"
-                : isEditing
-                  ? "Save Changes"
-                  : "Save & Continue to Portal →"}
+            {saving ? "Saving…" : needsApproval ? "Submit for Approval →" : isEditing ? "Save Changes" : "Save & Continue to Portal →"}
           </button>
         )}
       </form>

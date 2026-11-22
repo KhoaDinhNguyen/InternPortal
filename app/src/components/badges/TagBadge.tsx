@@ -6,6 +6,8 @@ const BADGE_CLASSES: Record<string, string> = {
   General: "bg-primary-light",
   Approved: "bg-secondary/13 text-secondary",
   Rejected: "bg-red-50 text-danger",
+  Ticket: "bg-tertiary/10 text-tertiary",
+  Resolved: "bg-secondary/13 text-secondary",
 };
 
 export default function TagBadge({ label }: { label: string }) {

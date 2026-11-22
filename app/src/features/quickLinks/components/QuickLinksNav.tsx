@@ -15,7 +15,7 @@ export default function QuickLinksNav({ linkStore }: QuickLinksNavProps) {
   const { links, addLink, removeLink } = linkStore;
 
   return (
-    <div className="mb-5 flex flex-wrap items-center gap-1 rounded-xl border bg-white p-2">
+    <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl bg-white p-2">
       {links.map((link) => (
         <QuickLinkItem key={link.id} link={link} onRemove={removeLink} />
       ))}

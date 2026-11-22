@@ -1,23 +1,15 @@
 interface WeeklyRequirementProps {
   weekTotal: number;
   requirement: number;
-  /** Admins see an input to change the target instead of the "to go" label */
-  canSetRequirement: boolean;
-  setRequirement: (hours: number) => void;
 }
 
 /**
  * Renders the weekly requirement card:
  * - Hours logged vs. the weekly target
- * - Remaining hours (or an editable target for admins)
+ * - Remaining hours (admins set the target per intern on Intern Configuration)
  * - Progress bar
  */
-export default function WeeklyRequirement({
-  weekTotal,
-  requirement,
-  canSetRequirement,
-  setRequirement,
-}: WeeklyRequirementProps) {
+export default function WeeklyRequirement({ weekTotal, requirement }: WeeklyRequirementProps) {
   const remaining = Math.max(requirement - weekTotal, 0);
   const progress = requirement > 0 ? Math.min((weekTotal / requirement) * 100, 100) : 0;
 
@@ -31,26 +23,9 @@ export default function WeeklyRequirement({
           </div>
         </div>
 
-        {canSetRequirement ? (
-          <label className="flex items-center gap-1 text-xs">
-            Target
-            <input
-              aria-label="Weekly hours requirement"
-              value={requirement}
-              onChange={(e) => setRequirement(Number(e.target.value))}
-              type="number"
-              min="0"
-              max="80"
-              step="1"
-              className="w-12 rounded-md border border-secondary/35 bg-white px-1 py-1 text-center outline-none focus:border-secondary"
-            />
-            h
-          </label>
-        ) : (
-          <span className="text-xs font-bold text-secondary">
-            {remaining ? `${remaining.toFixed(1)}h to go` : "Target met"}
-          </span>
-        )}
+        <span className="text-xs font-bold text-secondary">
+          {remaining ? `${remaining.toFixed(1)}h to go` : "Target met"}
+        </span>
       </div>
 
       <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-secondary/20">

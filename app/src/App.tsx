@@ -4,6 +4,8 @@ import HoursPage from "./pages/Hours";
 import LoginPage from "./pages/Login";
 import MessagesPage from "./pages/Messages";
 import OrganizationPage from "./pages/Organization";
+import TicketsPage from "./pages/Tickets";
+import InternConfigPage from "./pages/InternConfig";
 import ProtectedRoute from "@components/ProtectedRoute";
 import PortalLayout from "./layouts/PortalLayout";
 import AuthProvider from "./features/login/AuthProvider";
@@ -24,14 +26,21 @@ function App() {
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/hours" element={<HoursPage />} />
             <Route path="/organization" element={<OrganizationPage />} />
-          </Route>
+            <Route path="/tickets" element={<TicketsPage />} />
 
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/history" element={<HistoryPage />} />
+            {/* Admin-only pages that keep the sidebar */}
+            <Route element={<ProtectedRoute allow={["admin"]} />}>
+              <Route path="/intern-config" element={<InternConfigPage />} />
+            </Route>
+            <Route path="/history" element={<HistoryPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
         </Route>
 
         <Route element={<ProtectedRoute allow={["admin"]} />}>
-          <Route path="/admin" element={<AdminPage />} />
+          <Route element={<PortalLayout />}>
+            <Route path="/admin" element={<AdminPage />} />
+          </Route>
         </Route>
       </Routes>
     </AuthProvider>

@@ -32,10 +32,9 @@ export default function DashboardPage() {
     <>
       {/* Greeting */}
       <div className="mb-6">
-        <h1 className="text-2xl leading-tight font-extrabold">
-          {greeting}, {firstName} 👋
+        <h1 className="text-2xl leading-tight font-bold">
+          {greeting}, {firstName}
         </h1>
-        <p className="mt-1">{"Here's what's happening in your internship portal today."}</p>
       </div>
 
       <QuickLinksNav linkStore={quickLinks} />

@@ -71,9 +71,6 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen">
-      <AppHeader />
-      <AdminTabs />
-
       <main className="mx-auto flex max-w-225 flex-col gap-7 px-4 py-5 sm:px-8 sm:py-7">
         {/* Create user card */}
         <div className={sectionCardClass}>
@@ -141,11 +138,7 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <ProfileRequestsCard
-          requests={requests.filter((r) => r.status === "pending")}
-          error={requestsError}
-          onReview={handleReview}
-        />
+        <ProfileRequestsCard requests={requests.filter((r) => r.status === "pending")} error={requestsError} onReview={handleReview} />
 
         {/* Users table */}
         <div className={sectionCardClass}>
@@ -207,11 +200,7 @@ export default function AdminPage() {
                         </select>
                       </td>
                       <td className={CELL}>
-                        {u.profile ? (
-                          <span className="font-semibold text-green-500">✓ Complete</span>
-                        ) : (
-                          <span className="text-subtle">Pending</span>
-                        )}
+                        {u.profile ? <span className="font-semibold text-green-500">✓ Complete</span> : <span className="text-subtle">Pending</span>}
                       </td>
                       <td className={CELL}>
                         {u.profile && (

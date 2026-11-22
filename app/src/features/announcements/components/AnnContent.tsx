@@ -10,10 +10,12 @@ interface AnnContentProps {
   deleteAnn: (id: number) => void;
 }
 
-/** Profile-request notices are tinted green (approved) or red (rejected) */
+/** Pinned notices: profile decisions green/red, ticket alerts pink, resolved tickets green */
 const NOTICE_CLASSES: Record<string, { row: string; chevron: string }> = {
   Approved: { row: "bg-secondary/7", chevron: "text-secondary" },
   Rejected: { row: "bg-red-50", chevron: "text-danger" },
+  Ticket: { row: "bg-tertiary/7", chevron: "text-tertiary" },
+  Resolved: { row: "bg-secondary/7", chevron: "text-secondary" },
 };
 
 /* Renders the content of the annoucement

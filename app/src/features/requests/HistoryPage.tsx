@@ -16,30 +16,17 @@ export default function HistoryPage() {
   const location = useLocation();
 
   const isAdmin = user?.role === "admin";
-  const headers = isAdmin
-    ? ["User", "Submitted", "Status", "Changes", "Reviewed"]
-    : ["Submitted", "Status", "Changes", "Admin Note"];
+  const headers = isAdmin ? ["User", "Submitted", "Status", "Changes", "Reviewed"] : ["Submitted", "Status", "Changes", "Admin Note"];
 
   // Opened directly (e.g. in a new tab) there is no previous page to go back to
   const goBack = () => (location.key === "default" ? navigate("/") : navigate(-1));
 
   return (
     <div className="min-h-screen">
-      <AppHeader />
-
       <main className="mx-auto flex max-w-215 flex-col gap-6 px-6 py-8">
-        <button
-          type="button"
-          onClick={goBack}
-          className="self-start text-caption font-semibold text-primary hover:opacity-70">
-          ← Back
-        </button>
-
         <div>
           <h1 className="text-xl font-extrabold">Request History</h1>
-          <p className="mt-1 text-sm text-muted">
-            {isAdmin ? "All profile update requests across users." : "Your profile update requests."}
-          </p>
+          <p className="mt-1 text-sm text-muted">{isAdmin ? "All profile update requests across users." : "Your profile update requests."}</p>
         </div>
 
         {error && <p className="text-caption text-danger">{error}</p>}
@@ -87,9 +74,7 @@ export default function HistoryPage() {
                           ) : (
                             <div className="flex flex-wrap gap-1">
                               {changes.map((f) => (
-                                <span
-                                  key={f.key}
-                                  className="rounded-md bg-primary-light px-2 py-0.5 text-2xs font-semibold text-primary">
+                                <span key={f.key} className="rounded-md bg-primary-light px-2 py-0.5 text-2xs font-semibold text-primary">
                                   {f.label}
                                 </span>
                               ))}
@@ -97,9 +82,7 @@ export default function HistoryPage() {
                           )}
                         </td>
                         {isAdmin ? (
-                          <td className={cn(CELL, "whitespace-nowrap")}>
-                            {req.reviewedAt ? formatDate(req.reviewedAt) : "—"}
-                          </td>
+                          <td className={cn(CELL, "whitespace-nowrap")}>{req.reviewedAt ? formatDate(req.reviewedAt) : "—"}</td>
                         ) : (
                           <td className={cn(CELL, "max-w-55 text-muted")}>{req.adminNote || "—"}</td>
                         )}

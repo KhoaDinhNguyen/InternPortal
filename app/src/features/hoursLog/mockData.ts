@@ -27,5 +27,5 @@ export const PROJECTS = ["Engineering", "Design", "Product", "Research", "Learni
 
 export const DAY_LABELS: Record<string, string> = { 0: "Mon", 1: "Tue", 2: "Wed", 3: "Thu", 4: "Fri" }
 
-/** Hours an intern is expected to log per week; admins can change it */
+/** Weekly target for interns an admin hasn't configured yet (see Intern Configuration) */
 export const DEFAULT_WEEKLY_REQUIREMENT = 16
