@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import Card from "@components/Card";
 import CardHeader from "@components/CardHeader";
-import colors from "@styles/colors";
+import { toggleChipClass } from "@styles/ui";
 import CalendarGrid from "./CalendarGrid";
 import EventEntry from "./EventEntry";
 import NewEventForm from "./NewEventForm";
@@ -15,20 +15,7 @@ interface CalendarWidgetProps {
   onClose?: () => void;
 }
 
-const NAV_BTN: React.CSSProperties = {
-  width: 26,
-  height: 26,
-  borderRadius: 6,
-  border: "1px solid #C8DCF0",
-  background: "transparent",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "#1A1A1A",
-  fontSize: 16,
-  transition: "background 0.1s",
-};
+const NAV_BTN = "flex size-6.5 items-center justify-center rounded-md border text-base transition-colors hover:bg-primary-light";
 
 /**
  * Renders the calendar widget, includes:
@@ -80,18 +67,7 @@ export default function CalendarWidget({ calendarStore, onExpand, onClose }: Cal
   const addButton = (
     <button
       onClick={() => (adding ? setAdding(false) : openForm(selectedDay))}
-      style={{
-        padding: "3px 10px",
-        borderRadius: 6,
-        border: `1px solid ${adding ? colors.MAGENTA : "#C8DCF0"}`,
-        background: adding ? colors.MAGENTA_LIGHT : "transparent",
-        color: adding ? colors.MAGENTA : "#1A1A1A",
-        fontFamily: "Helvetica, Arial, sans-serif",
-        fontSize: 12,
-        fontWeight: 600,
-        cursor: "pointer",
-        transition: "all 0.15s",
-      }}>
+      className={toggleChipClass(adding)}>
       {adding ? "Cancel" : "+ Add event"}
     </button>
   );
@@ -103,21 +79,17 @@ export default function CalendarWidget({ calendarStore, onExpand, onClose }: Cal
         onExpand={onExpand}
         onClose={onClose}
         action={
-          <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+          <div className="flex items-center gap-1">
             <button
               onClick={() => stepMonth(prevMonth)}
               title="Previous month"
-              style={NAV_BTN}
-              onMouseEnter={(e) => (e.currentTarget.style.background = colors.MAGENTA_LIGHT)}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+              className={NAV_BTN}>
               ‹
             </button>
             <button
               onClick={() => stepMonth(nextMonth)}
               title="Next month"
-              style={NAV_BTN}
-              onMouseEnter={(e) => (e.currentTarget.style.background = colors.MAGENTA_LIGHT)}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
+              className={NAV_BTN}>
               ›
             </button>
           </div>
@@ -137,17 +109,11 @@ export default function CalendarWidget({ calendarStore, onExpand, onClose }: Cal
       />
 
       {/* Events panel */}
-      <div style={{ padding: "10px 20px 6px", borderTop: "1px solid #D4E6F5" }}>
+      <div className="border-t border-divider px-5 pt-2.5 pb-1.5">
         {selectedDay ? (
           <>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-              <span
-                style={{
-                  fontFamily: "Helvetica, Arial, sans-serif",
-                  fontSize: 12,
-                  color: "#1A1A1A",
-                  letterSpacing: "0.06em",
-                }}>
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-xs tracking-wider">
                 {MONTHS[viewMonth].toUpperCase()} {selectedDay}
               </span>
               {addButton}
@@ -156,37 +122,19 @@ export default function CalendarWidget({ calendarStore, onExpand, onClose }: Cal
             {adding && <NewEventForm form={form} post={post} />}
 
             {dayEvents.length > 0 ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 12 }}>
+              <div className="mb-3 flex flex-col gap-1">
                 {dayEvents.map((ev) => (
                   <EventEntry key={ev.id} event={ev} removeEvent={removeEvent} />
                 ))}
               </div>
             ) : (
-              !adding && (
-                <div
-                  style={{
-                    fontFamily: "Helvetica, Arial, sans-serif",
-                    fontSize: 14,
-                    color: "#1A1A1A",
-                    paddingBottom: 12,
-                  }}>
-                  No events — add one above
-                </div>
-              )
+              !adding && <p className="pb-3 text-sm">No events — add one above</p>
             )}
           </>
         ) : (
           <>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingBottom: adding ? 8 : 12,
-              }}>
-              <span style={{ fontFamily: "Helvetica, Arial, sans-serif", fontSize: 14, color: "#1A1A1A" }}>
-                Select a day to view events
-              </span>
+            <div className={adding ? "flex items-center justify-between pb-2" : "flex items-center justify-between pb-3"}>
+              <span className="text-sm">Select a day to view events</span>
               {addButton}
             </div>
             {adding && <NewEventForm form={form} post={post} />}

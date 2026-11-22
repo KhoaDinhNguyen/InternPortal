@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import colors from "@styles/colors";
+import { cn } from "@lib/cn";
+import { pickerFieldClass } from "@styles/ui";
 import ChevronIcon from "@icons/ChevronIcon";
 import { ALL_TIMES } from "../mockData";
 
@@ -82,18 +83,8 @@ export default function TimeDropdown({ value, onChange }: TimeDropdownProps) {
   }
 
   return (
-    <div ref={containerRef} style={{ position: "relative", flex: 1 }}>
-      <div
-        style={{
-          height: 40,
-          overflow: "hidden",
-          display: "flex",
-          alignItems: "center",
-          border: `1px solid ${isOpen ? colors.MAGENTA : "#C8DCF0"}`,
-          borderRadius: 8,
-          background: "#fff",
-          transition: "border-color 0.15s",
-        }}>
+    <div ref={containerRef} className="relative min-w-0 flex-1">
+      <div className={pickerFieldClass(isOpen)}>
         <input
           ref={inputRef}
           value={focused ? typed : value}
@@ -111,18 +102,7 @@ export default function TimeDropdown({ value, onChange }: TimeDropdownProps) {
             if (e.key === "Escape") close();
           }}
           placeholder="9:00 AM"
-          style={{
-            flex: 1,
-            padding: "0 10px",
-            border: "none",
-            outline: "none",
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            color: "#1A1A1A",
-            background: "transparent",
-            minWidth: 0,
-            height: "100%",
-          }}
+          className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-sm outline-none"
         />
         <button
           title="Show times"
@@ -138,16 +118,7 @@ export default function TimeDropdown({ value, onChange }: TimeDropdownProps) {
               inputRef.current?.focus();
             }
           }}
-          style={{
-            padding: "0 10px",
-            border: "none",
-            background: "transparent",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            flexShrink: 0,
-            color: "#1A1A1A",
-          }}>
+          className="flex h-full shrink-0 items-center px-2.5">
           <ChevronIcon flipped={isOpen} />
         </button>
       </div>
@@ -155,19 +126,7 @@ export default function TimeDropdown({ value, onChange }: TimeDropdownProps) {
       {isOpen && (
         <div
           ref={listRef}
-          style={{
-            position: "absolute",
-            top: "calc(100% + 4px)",
-            left: 0,
-            right: 0,
-            zIndex: 50,
-            background: "#fff",
-            border: "1px solid #C8DCF0",
-            borderRadius: 10,
-            boxShadow: "0 8px 24px rgba(0,0,0,0.10)",
-            maxHeight: 220,
-            overflowY: "auto",
-          }}>
+          className="absolute inset-x-0 top-full z-50 mt-1 max-h-55 overflow-y-auto rounded-xl border bg-white shadow-lg">
           {ALL_TIMES.map((t, i) => {
             const isSelected = i === selectedIdx;
 
@@ -181,31 +140,16 @@ export default function TimeDropdown({ value, onChange }: TimeDropdownProps) {
                   e.preventDefault();
                   select(t);
                 }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "9px 14px 9px 12px",
-                  borderLeft: isSelected ? `3px solid ${colors.MAGENTA}` : "3px solid transparent",
-                  background: isSelected ? colors.MAGENTA_LIGHT : "transparent",
-                  cursor: "pointer",
-                  fontFamily: "Helvetica, Arial, sans-serif",
-                  fontSize: 14,
-                  fontWeight: isSelected ? 600 : 400,
-                  color: isSelected ? colors.MAGENTA : "#1A1A1A",
-                }}
-                onMouseEnter={(e) => {
-                  if (!isSelected) e.currentTarget.style.background = colors.MAGENTA_LIGHT;
-                }}
-                onMouseLeave={(e) => {
-                  if (!isSelected) e.currentTarget.style.background = "transparent";
-                }}>
+                className={cn(
+                  "flex items-center justify-between border-l-3 py-2 pr-3.5 pl-3 text-sm hover:bg-primary-light",
+                  isSelected ? "border-primary bg-primary-light font-semibold text-primary" : "border-transparent",
+                )}>
                 <span>{t}</span>
                 {isSelected && (
                   <svg width="14" height="11" viewBox="0 0 14 11" fill="none">
                     <path
                       d="M1 5L5.5 9.5L13 1"
-                      stroke={colors.MAGENTA}
+                      stroke="currentColor"
                       strokeWidth="1.8"
                       strokeLinecap="round"
                       strokeLinejoin="round"

@@ -1,3 +1,4 @@
+import { cn } from "@lib/cn";
 import ConversationItem from "./ConversationlItem";
 import type { DmConversation, DmUser } from "../types";
 
@@ -23,7 +24,7 @@ export default function ConversationList({
   onSelect,
 }: ConversationListProps) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", overflowY: "auto", flex: fullscreen ? 1 : undefined }}>
+    <div className={cn("flex flex-col overflow-y-auto", fullscreen && "flex-1")}>
       {conversations.map((c) => (
         <ConversationItem
           authId={authId}

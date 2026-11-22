@@ -1,9 +1,9 @@
 import type { RefObject, KeyboardEvent } from "react";
 
+import { cn } from "@lib/cn";
+import { inputClass, primaryButtonClass } from "@styles/ui";
 import type { DmMessage } from "../types";
 import { senderDisplayName } from "../utils/dmFormat";
-
-import colors from "@styles/colors";
 import { DM_USERS } from "../mockData";
 
 interface MessageComposerProps {
@@ -32,44 +32,16 @@ export default function MessageComposer(props: MessageComposerProps) {
     <>
       {replyTo && <ReplyBar authId={authId} replyTo={replyTo} onCancel={onCancelReply} />}
 
-      <div style={{ padding: "12px 20px", borderTop: "1px solid #D4E6F5", display: "flex", gap: 8, flexShrink: 0 }}>
+      <div className="flex shrink-0 gap-2 border-t border-divider px-5 py-3">
         <input
           ref={inputRef}
           value={draft}
-          onChange={(e) => {
-            onDraftChange(e.target.value);
-            clearTimeout((inputRef?.current as any)?._typingTimer);
-          }}
+          onChange={(e) => onDraftChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          style={{
-            flex: 1,
-            padding: "9px 14px",
-            borderRadius: 10,
-            border: "1.5px solid #C8DCF0",
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            color: "#1A1A1A",
-            outline: "none",
-            background: "#fff",
-          }}
+          className={cn(inputClass, "min-w-0 flex-1 rounded-xl px-3.5")}
         />
-        <button
-          onClick={onSend}
-          style={{
-            padding: "9px 18px",
-            borderRadius: 10,
-            border: "none",
-            background: colors.MAGENTA,
-            color: "#fff",
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: "pointer",
-            transition: "background 0.15s",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = colors.MAGENTA_DARK)}
-          onMouseLeave={(e) => (e.currentTarget.style.background = colors.MAGENTA)}>
+        <button onClick={onSend} className={cn(primaryButtonClass, "rounded-xl px-4.5")}>
           Send
         </button>
       </div>
@@ -86,39 +58,14 @@ interface ReplyBarProps {
 /** The "Replying to X: ..." strip shown above the composer input. */
 export function ReplyBar({ authId, replyTo, onCancel }: ReplyBarProps) {
   return (
-    <div
-      style={{
-        padding: "8px 20px",
-        borderTop: "1px solid #D4E6F5",
-        background: "#F5F9FF",
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-      }}>
-      <div
-        style={{
-          flex: 1,
-          fontSize: 13,
-          fontFamily: "Helvetica, Arial, sans-serif",
-          color: "#1A1A1A",
-          borderLeft: `3px solid ${colors.MAGENTA}`,
-          paddingLeft: 8,
-        }}>
+    <div className="flex items-center gap-2.5 border-t border-divider bg-hover px-5 py-2">
+      <div className="flex-1 border-l-3 border-primary pl-2 text-caption">
         Replying to{" "}
         <strong>{replyTo.senderId === authId ? "yourself" : senderDisplayName(replyTo.senderId, DM_USERS)}</strong>:{" "}
         {replyTo.text}
       </div>
 
-      <button
-        onClick={onCancel}
-        style={{
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-          fontSize: 16,
-          color: "#999",
-          lineHeight: 1,
-        }}>
+      <button onClick={onCancel} aria-label="Cancel reply" className="text-base leading-none text-gray-400">
         ×
       </button>
     </div>

@@ -1,26 +1,10 @@
 import type { AuthError } from "./supabase.types";
 import type { Profile } from "../features/login/types";
 import type { ProfileUpdateRequest, ReviewDecision, UserNotification } from "../features/requests/types";
+import { NOTIFICATIONS_KEY, readList, writeList } from "./mockStore";
 import { delay, readSession, readUsers, writeUsers } from "./supabase";
 
 const REQUESTS_KEY = "mock-profile-requests";
-const NOTIFICATIONS_KEY = "mock-notifications";
-
-function read<T>(key: string): T[] {
-  try {
-    return JSON.parse(localStorage.getItem(key) ?? "[]");
-  } catch {
-    return [];
-  }
-}
-
-function write<T>(key: string, items: T[]): void {
-  try {
-    localStorage.setItem(key, JSON.stringify(items));
-  } catch {
-    // storage unavailable — changes are lost on reload
-  }
-}
 
 type Result<T> = { data: T; error: AuthError | null };
 const fail = (message: string, status: number): AuthError => ({ message, status });
@@ -35,7 +19,7 @@ async function submitProfileUpdate(newProfile: Profile): Promise<Result<ProfileU
   if (!me?.profile) return { data: null, error: fail("Complete your profile first", 400) };
   if (me.role === "admin") return { data: null, error: fail("Admins update their profile directly", 400) };
 
-  const requests = read<ProfileUpdateRequest>(REQUESTS_KEY);
+  const requests = readList<ProfileUpdateRequest>(REQUESTS_KEY);
   if (requests.some((r) => r.userId === me.id && r.status === "pending")) {
     return { data: null, error: fail("You already have a profile update waiting for review", 409) };
   }
@@ -50,7 +34,7 @@ async function submitProfileUpdate(newProfile: Profile): Promise<Result<ProfileU
     oldProfile: me.profile,
     newProfile,
   };
-  write(REQUESTS_KEY, [...requests, request]);
+  writeList(REQUESTS_KEY, [...requests, request]);
 
   return { data: request, error: null };
 }
@@ -62,7 +46,7 @@ async function listProfileRequests(): Promise<Result<ProfileUpdateRequest[]>> {
   const me = readSession()?.user;
   if (!me) return { data: [], error: fail("Not signed in", 401) };
 
-  const all = read<ProfileUpdateRequest>(REQUESTS_KEY);
+  const all = readList<ProfileUpdateRequest>(REQUESTS_KEY);
   const visible = me.role === "admin" ? all : all.filter((r) => r.userId === me.id);
 
   return { data: [...visible].reverse(), error: null };
@@ -77,7 +61,7 @@ async function reviewProfileRequest(
   await delay(300);
   if (readSession()?.user.role !== "admin") return { data: null, error: fail("Only admins can review requests", 403) };
 
-  const requests = read<ProfileUpdateRequest>(REQUESTS_KEY);
+  const requests = readList<ProfileUpdateRequest>(REQUESTS_KEY);
   const req = requests.find((r) => r.id === id);
   if (!req || req.status !== "pending") return { data: null, error: fail("Request not found or already reviewed", 404) };
 
@@ -87,7 +71,7 @@ async function reviewProfileRequest(
     reviewedAt: new Date().toISOString(),
     adminNote: note?.trim() || undefined,
   };
-  write(REQUESTS_KEY, requests.map((r) => (r.id === id ? reviewed : r)));
+  writeList(REQUESTS_KEY, requests.map((r) => (r.id === id ? reviewed : r)));
 
   if (decision === "approved") {
     writeUsers(readUsers().map((u) => (u.id === req.userId ? { ...u, profile: req.newProfile } : u)));
@@ -110,7 +94,7 @@ async function reviewProfileRequest(
           }`,
       }),
   };
-  write(NOTIFICATIONS_KEY, [...read<UserNotification>(NOTIFICATIONS_KEY), notification]);
+  writeList(NOTIFICATIONS_KEY, [...readList<UserNotification>(NOTIFICATIONS_KEY), notification]);
 
   return { data: reviewed, error: null };
 }
@@ -119,11 +103,11 @@ async function listNotifications(): Promise<Result<UserNotification[]>> {
   await delay(200);
   const me = readSession()?.user;
 
-  return { data: me ? read<UserNotification>(NOTIFICATIONS_KEY).filter((n) => n.userId === me.id) : [], error: null };
+  return { data: me ? readList<UserNotification>(NOTIFICATIONS_KEY).filter((n) => n.userId === me.id) : [], error: null };
 }
 
 async function dismissNotification(id: number): Promise<Result<null>> {
-  write(NOTIFICATIONS_KEY, read<UserNotification>(NOTIFICATIONS_KEY).filter((n) => n.id !== id));
+  writeList(NOTIFICATIONS_KEY, readList<UserNotification>(NOTIFICATIONS_KEY).filter((n) => n.id !== id));
   return { data: null, error: null };
 }
 

@@ -27,7 +27,7 @@ export default function MessageList({
   bottomRef,
 }: MessageListProps) {
   return (
-    <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: 8 }}>
+    <div className="flex flex-1 flex-col gap-2 overflow-y-auto px-5 py-4">
       {convo.messages.map((msg, i) => {
         const isMine = msg.senderId === authId;
         const prevSameSender = i > 0 && convo.messages[i - 1].senderId === msg.senderId;

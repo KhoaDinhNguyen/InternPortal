@@ -1,14 +1,22 @@
 import { useNewTodoForm } from "../hooks";
 
 import Avatar from "@icons/Avatar";
+import { cn } from "@lib/cn";
+import { inputClass, primaryButtonClass } from "@styles/ui";
 
 import { authUser, TEAM_MEMBERS } from "../mockData";
 import type { AssignMode, Todo } from "../types";
-import colors from "@styles/colors";
 
 interface NewTaskPanelProps {
   addTodo: (todo: Omit<Todo, "id">) => void;
 }
+
+/** Ring colour, and fill when selected, for each priority dot */
+const PRIORITY_CLASSES = {
+  low: { ring: "border-emerald-500", fill: "bg-emerald-500" },
+  medium: { ring: "border-amber-500", fill: "bg-amber-500" },
+  high: { ring: "border-red-500", fill: "bg-red-500" },
+} as const;
 
 /**
  * Renders the input form for new to-do task, includes
@@ -20,11 +28,11 @@ interface NewTaskPanelProps {
  */
 export default function NewTodoPanel({ addTodo }: NewTaskPanelProps) {
   // prettier-ignore
-  const { 
+  const {
     text, setText,
     priority, setPriority,
     assignMode, setAssignMode,
-    delegateTo, setDelegateTo, 
+    delegateTo, setDelegateTo,
     customDelegate, setCustomDelegate ,
     buildTodo, reset
   } = useNewTodoForm(authUser);
@@ -39,28 +47,17 @@ export default function NewTodoPanel({ addTodo }: NewTaskPanelProps) {
   }
 
   return (
-    <div style={{ padding: "14px 20px 18px", borderTop: "1px solid #D4E6F5", background: "#FFFFFF" }}>
+    <div className="border-t border-divider px-5 pt-3.5 pb-4.5">
       {/* Mode toggle */}
-      <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+      <div className="mb-2.5 flex gap-1.5">
         {(["self", "delegate"] as AssignMode[]).map((mode) => (
           <button
             key={mode}
             onClick={() => setAssignMode(mode)}
-            style={{
-              padding: "5px 14px",
-              borderRadius: 7,
-              border: `1.5px solid ${assignMode === mode ? colors.MAGENTA : "#C8DCF0"}`,
-              background: assignMode === mode ? colors.MAGENTA : "#fff",
-              color: assignMode === mode ? "#fff" : "#1A1A1A",
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.15s",
-              display: "flex",
-              alignItems: "center",
-              gap: 5,
-            }}>
+            className={cn(
+              "flex items-center gap-1.5 rounded-md border px-3.5 py-1 text-sm font-semibold transition-colors",
+              assignMode === mode ? "border-primary bg-primary text-white" : "bg-white hover:bg-hover",
+            )}>
             {mode === "self" ? (
               <>
                 <Avatar name={authUser} size={14} />
@@ -68,7 +65,7 @@ export default function NewTodoPanel({ addTodo }: NewTaskPanelProps) {
               </>
             ) : (
               <>
-                <span style={{ fontSize: 16 }}>→</span>
+                <span className="text-base">→</span>
                 Delegate to someone
               </>
             )}
@@ -78,23 +75,8 @@ export default function NewTodoPanel({ addTodo }: NewTaskPanelProps) {
 
       {/* Delegate target picker */}
       {assignMode === "delegate" && (
-        <div style={{ marginBottom: 8 }}>
-          <select
-            value={delegateTo}
-            onChange={(e) => setDelegateTo(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "7px 10px",
-              borderRadius: 8,
-              border: "1.5px solid #C8DCF0",
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 14,
-              color: "#1A1A1A",
-              background: "#fff",
-              outline: "none",
-              cursor: "pointer",
-              appearance: "none",
-            }}>
+        <div className="mb-2 flex flex-col gap-1.5">
+          <select value={delegateTo} onChange={(e) => setDelegateTo(e.target.value)} className={cn(inputClass, "w-full")}>
             <option value="">Select a team member…</option>
             {TEAM_MEMBERS.filter((m) => m !== authUser).map((m) => (
               <option key={m} value={m}>
@@ -108,85 +90,39 @@ export default function NewTodoPanel({ addTodo }: NewTaskPanelProps) {
               value={customDelegate}
               onChange={(e) => setCustomDelegate(e.target.value)}
               placeholder="Enter their name"
-              style={{
-                width: "100%",
-                padding: "7px 10px",
-                borderRadius: 8,
-                border: "1.5px solid #C8DCF0",
-                fontFamily: "Helvetica, Arial, sans-serif",
-                fontSize: 14,
-                color: "#1A1A1A",
-                background: "#fff",
-                outline: "none",
-                marginTop: 6,
-              }}
+              className={cn(inputClass, "w-full")}
             />
           )}
         </div>
       )}
 
       {/* Task input row */}
-      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+      <div className="flex items-center gap-2">
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && post()}
           placeholder={assignMode === "self" ? "Add a task for yourself…" : "Describe the task to delegate…"}
-          style={{
-            flex: 1,
-            padding: "8px 12px",
-            borderRadius: 8,
-            border: "1.5px solid #C8DCF0",
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            color: "#1A1A1A",
-            background: "#fff",
-            outline: "none",
-          }}
+          className={cn(inputClass, "min-w-0 flex-1")}
         />
 
         {/* Priority dots */}
-        <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
-          {(["low", "medium", "high"] as const).map((p) => {
-            const colors = { low: "#10B981", medium: "#F59E0B", high: "#EF4444" };
-            return (
-              <button
-                key={p}
-                onClick={() => setPriority(p)}
-                title={`${p} priority`}
-                style={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: "50%",
-                  border: `2px solid ${colors[p]}`,
-                  background: priority === p ? colors[p] : "transparent",
-                  cursor: "pointer",
-                  transition: "all 0.15s",
-                }}
-              />
-            );
-          })}
+        <div className="flex items-center gap-1.5">
+          {(["low", "medium", "high"] as const).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPriority(p)}
+              title={`${p} priority`}
+              className={cn(
+                "size-3.5 rounded-full border-2 transition-colors",
+                PRIORITY_CLASSES[p].ring,
+                priority === p && PRIORITY_CLASSES[p].fill,
+              )}
+            />
+          ))}
         </div>
 
-        {/** Post button */}
-        <button
-          onClick={post}
-          style={{
-            padding: "8px 16px",
-            borderRadius: 8,
-            border: "none",
-            background: colors.MAGENTA,
-            color: "#fff",
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: "pointer",
-            flexShrink: 0,
-            transition: "opacity 0.15s",
-            whiteSpace: "nowrap",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = colors.MAGENTA_DARK)}
-          onMouseLeave={(e) => (e.currentTarget.style.background = colors.MAGENTA)}>
+        <button onClick={post} className={cn(primaryButtonClass, "shrink-0 whitespace-nowrap")}>
           {assignMode === "self" ? "Add Task" : "Delegate"}
         </button>
       </div>

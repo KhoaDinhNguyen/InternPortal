@@ -1,31 +1,16 @@
 import { useActionState, useState } from "react";
 import { useLocation, Navigate, type Location } from "react-router";
+import CenteredCardLayout from "@components/CenteredCardLayout";
+import { cn } from "@lib/cn";
+import { inputClass, labelClass, primaryButtonClass } from "@styles/ui";
 import { supabase } from "../lib/supabase";
-import colors from "@styles/colors";
 import { useAuth } from "../features/login/useAuth";
 
-const field: React.CSSProperties = {
-  width: "100%",
-  padding: "10px 14px",
-  borderRadius: 8,
-  border: "1.5px solid #C8DCF0",
-  fontFamily: "Helvetica, Arial, sans-serif",
-  fontSize: 14,
-  color: "#1A1A1A",
-  outline: "none",
-  background: "#fff",
-  boxSizing: "border-box",
-};
-
-const label: React.CSSProperties = {
-  fontFamily: "Helvetica, Arial, sans-serif",
-  fontSize: 12,
-  fontWeight: 600,
-  color: "#1A1A1A",
-  letterSpacing: "0.04em",
-  display: "block",
-  marginBottom: 6,
-};
+const DEMO_ACCOUNTS = [
+  ["Admin", "admin@portal.com", "admin123"],
+  ["Intern (Maya)", "maya@portal.com", "maya123"],
+  ["NorthStar", "priya@portal.com", "priya123"],
+];
 
 export default function LoginPage() {
   const { user } = useAuth();
@@ -50,194 +35,72 @@ export default function LoginPage() {
     return <Navigate to={from} replace />;
   }
 
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#FFFFFF",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 24,
-      }}>
-      <div style={{ width: "100%", maxWidth: 400 }}>
-        {/* Logo / wordmark */}
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <div
-            style={{
-              width: 52,
-              height: 52,
-              borderRadius: 14,
-              background: colors.MAGENTA,
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 14,
-            }}>
-            <span style={{ fontSize: 26, color: "#fff" }}>✦</span>
-          </div>
-          <div style={{ fontFamily: "Helvetica, Arial, sans-serif", fontWeight: 800, fontSize: 22, color: "#1A1A1A" }}>
-            Intern Portal
-          </div>
-          <div style={{ fontFamily: "Helvetica, Arial, sans-serif", fontSize: 13, color: "#4A6B8A", marginTop: 4 }}>
-            Sign in to your account
-          </div>
-        </div>
-
-        {/* Card */}
-        <div
-          style={{
-            background: "#fff",
-            borderRadius: 16,
-            border: "1px solid #C8DCF0",
-            boxShadow: "0 4px 24px rgba(10,26,50,0.08)",
-            padding: "32px 32px 28px",
-          }}>
-          <form action={submit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div>
-              <label htmlFor="email" style={label}>
-                EMAIL ADDRESS
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@portal.com"
-                style={field}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" style={label}>
-                PASSWORD
-              </label>
-              <div style={{ position: "relative" }}>
-                <input
-                  id="password"
-                  type={showPw ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  style={{ ...field, paddingRight: 40 }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPw((s) => !s)}
-                  style={{
-                    position: "absolute",
-                    right: 12,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: 16,
-                    color: "#8FA5BC",
-                    padding: 0,
-                  }}>
-                  {showPw ? "🙈" : "👁"}
-                </button>
-              </div>
-            </div>
-
-            {error && (
-              <div
-                style={{
-                  background: "#FFF0F0",
-                  border: "1px solid #FFCCCC",
-                  borderRadius: 8,
-                  padding: "9px 13px",
-                  fontFamily: "Helvetica, Arial, sans-serif",
-                  fontSize: 13,
-                  color: "#C0392B",
-                }}>
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={pending}
-              style={{
-                width: "100%",
-                padding: "11px",
-                borderRadius: 9,
-                border: "none",
-                background: colors.MAGENTA,
-                color: "#fff",
-                fontFamily: "Helvetica, Arial, sans-serif",
-                fontSize: 15,
-                fontWeight: 700,
-                cursor: "pointer",
-                letterSpacing: "0.02em",
-                transition: "background 0.15s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = colors.MAGENTA_DARK)}
-              onMouseLeave={(e) => (e.currentTarget.style.background = colors.MAGENTA)}>
-              {pending ? "Signing in…" : "Sign In"}
-            </button>
-          </form>
-
-          <div
-            style={{
-              marginTop: 20,
-              textAlign: "center",
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 12,
-              color: "#8FA5BC",
-            }}>
-            Don't have access? Contact your program administrator.
-          </div>
-        </div>
-
-        {/* Demo hint */}
-        <div
-          style={{
-            marginTop: 16,
-            padding: "12px 16px",
-            background: "#EBF4FF",
-            borderRadius: 10,
-            border: "1px solid #C8DCF0",
-          }}>
-          <div
-            style={{
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 11,
-              fontWeight: 700,
-              color: colors.MAGENTA,
-              letterSpacing: "0.06em",
-              marginBottom: 6,
-            }}>
-            DEMO CREDENTIALS
-          </div>
-          {[
-            ["Admin", "admin@portal.com", "admin123"],
-            ["Intern (Maya)", "maya@portal.com", "maya123"],
-            ["NorthStar", "priya@portal.com", "priya123"],
-          ].map(([label, em, pw]) => (
-            <button
-              key={em}
-              onClick={() => {
-                setEmail(em);
-                setPassword(pw);
-              }}
-              style={{
-                display: "block",
-                width: "100%",
-                textAlign: "left",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                padding: "2px 0",
-                fontFamily: "Helvetica, Arial, sans-serif",
-                fontSize: 12,
-                color: "#1A1A1A",
-              }}>
-              <strong>{label}:</strong> {em} / {pw}
-            </button>
-          ))}
-        </div>
-      </div>
+  const demoHint = (
+    <div className="mt-4 rounded-xl border bg-primary-light px-4 py-3">
+      <div className="mb-1.5 text-2xs font-bold tracking-wider text-primary">DEMO CREDENTIALS</div>
+      {DEMO_ACCOUNTS.map(([label, em, pw]) => (
+        <button
+          key={em}
+          onClick={() => {
+            setEmail(em);
+            setPassword(pw);
+          }}
+          className="block w-full py-0.5 text-left text-xs">
+          <strong>{label}:</strong> {em} / {pw}
+        </button>
+      ))}
     </div>
+  );
+
+  return (
+    <CenteredCardLayout title="Intern Portal" subtitle="Sign in to your account" bottom={demoHint}>
+      <form action={submit} className="flex flex-col gap-4">
+        <div>
+          <label htmlFor="email" className={labelClass}>
+            EMAIL ADDRESS
+          </label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@portal.com"
+            className={cn(inputClass, "w-full")}
+          />
+        </div>
+        <div>
+          <label htmlFor="password" className={labelClass}>
+            PASSWORD
+          </label>
+          <div className="relative">
+            <input
+              id="password"
+              type={showPw ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className={cn(inputClass, "w-full pr-10")}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPw((s) => !s)}
+              aria-label={showPw ? "Hide password" : "Show password"}
+              className="absolute top-1/2 right-3 -translate-y-1/2 text-subtle">
+              {showPw ? "🙈" : "👁"}
+            </button>
+          </div>
+        </div>
+
+        {error && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-caption text-danger">{error}</div>
+        )}
+
+        <button type="submit" disabled={pending} className={cn(primaryButtonClass, "w-full py-2.5 font-bold")}>
+          {pending ? "Signing in…" : "Sign In"}
+        </button>
+      </form>
+
+      <p className="mt-5 text-center text-xs text-subtle">Don't have access? Contact your program administrator.</p>
+    </CenteredCardLayout>
   );
 }

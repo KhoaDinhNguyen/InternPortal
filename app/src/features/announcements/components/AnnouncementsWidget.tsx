@@ -39,17 +39,9 @@ export default function AnnouncementsWidget({ annStore, onExpand, onClose }: Ann
       {form.composing && <PostAnnForm form={form} onPost={post} />}
 
       {anns.length === 0 ? (
-        <div
-          style={{
-            padding: "32px 20px",
-            textAlign: "center",
-            fontFamily: "Helvetica, Arial, sans-serif",
-            fontSize: 14,
-            color: "#1A1A1A",
-            opacity: 0.45,
-          }}>
+        <p className="px-5 py-8 text-center text-sm opacity-45">
           You're all caught up — no announcements
-        </div>
+        </p>
       ) : (
         anns.map((ann) => (
           <AnnContent key={ann.id} ann={ann} openIds={openIds} toggleAnnBody={toggleBody} deleteAnn={deleteAnn} />

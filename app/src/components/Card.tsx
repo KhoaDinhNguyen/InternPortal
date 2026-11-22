@@ -1,12 +1,10 @@
+import { cn } from "@lib/cn";
+
 interface CardProps {
   children: React.ReactNode;
-  style?: React.CSSProperties;
+  className?: string;
 }
 
-export default function Card({ children, style = {} }: CardProps) {
-  return (
-    <div style={{ background: "#fff", border: "1px solid #C8DCF0", borderRadius: 12, overflow: "hidden", ...style }}>
-      {children}
-    </div>
-  );
+export default function Card({ children, className }: CardProps) {
+  return <div className={cn("overflow-hidden rounded-xl border bg-white", className)}>{children}</div>;
 }

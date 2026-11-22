@@ -48,7 +48,7 @@ export function useDmConversations(authId: string, initialConvos: DmConversation
     }, 800)
 
     return newMsg;
-  }, [activeId, , authId]);
+  }, [activeId, authId]);
 
   const toggleReaction = useCallback((convoId: string, msgId: string, emoji: string) => {
     setConvos(cs => updateConversationById(cs, convoId, (c) => toggleMessageReaction(c, msgId, emoji, authId)))
@@ -56,6 +56,10 @@ export function useDmConversations(authId: string, initialConvos: DmConversation
 
   const togglePin = useCallback((convoId: string) => {
     setConvos(cs => updateConversationById(cs, convoId, (c) => ({ ...c, isPinned: !c.isPinned })));
+  }, [])
+
+  const toggleMute = useCallback((convoId: string) => {
+    setConvos(cs => updateConversationById(cs, convoId, (c) => ({ ...c, isMuted: !c.isMuted })));
   }, [])
 
   return {
@@ -66,6 +70,6 @@ export function useDmConversations(authId: string, initialConvos: DmConversation
     // helper
     otherUser, convoName,
     // actions
-    openConvo, sendMessage, toggleReaction, togglePin
+    openConvo, sendMessage, toggleReaction, togglePin, toggleMute
   }
 }

@@ -1,18 +1,5 @@
-import colors from "@styles/colors";
+const DOT_CLASSES = { high: "bg-primary", medium: "bg-tertiary", low: "bg-secondary" };
 
 export default function PriorityDot({ priority }: { priority: "low" | "medium" | "high" }) {
-  const dotColors = { high: colors.MAGENTA, medium: colors.TERTIARY, low: colors.SECONDARY };
-
-  return (
-    <span
-      style={{
-        width: 7,
-        height: 7,
-        borderRadius: "50%",
-        background: dotColors[priority],
-        flexShrink: 0,
-        display: "inline-block",
-      }}
-    />
-  );
+  return <span className={`inline-block size-2 shrink-0 rounded-full ${DOT_CLASSES[priority]}`} />;
 }

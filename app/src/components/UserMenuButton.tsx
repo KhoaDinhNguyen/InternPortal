@@ -1,15 +1,17 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router";
 
 import Avatar from "@icons/Avatar";
-import colors from "@styles/colors";
-import { ROLE_LABELS, ROLE_COLORS } from "../features/login/mockData";
+import { cn } from "@lib/cn";
+import { ROLE_LABELS, ROLE_BADGE_CLASSES } from "../features/login/mockData";
 import { supabase } from "../lib/supabase";
 import type { User } from "../lib/supabase.types";
-import { useNavigate } from "react-router";
 
 interface UserMenuButtonProps {
   currentUser: User;
 }
+
+const MENU_ITEM = "flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm transition-colors";
 
 export default function UserMenuButton({ currentUser }: UserMenuButtonProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -39,177 +41,75 @@ export default function UserMenuButton({ currentUser }: UserMenuButtonProps) {
 
   const isAdmin = currentUser.role === "admin";
 
+  const items = [
+    { label: "My Profile", icon: "👤", to: "/profile" },
+    // Admins reach Admin and Request History from the sidebar instead
+    ...(isAdmin ? [] : [{ label: "Request History", icon: "📋", to: "/history" }]),
+  ];
+
   return (
-    <div ref={menuRef} style={{ position: "relative" }}>
+    <div ref={menuRef} className="relative">
       <button
         onClick={() => setMenuOpen((o) => !o)}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 9,
-          padding: "5px 10px",
-          borderRadius: 10,
-          background: colors.MAGENTA_LIGHT,
-          border: `1.5px solid ${menuOpen ? colors.MAGENTA : "transparent"}`,
-          cursor: "pointer",
-        }}>
+        className={cn(
+          "flex items-center gap-2 rounded-xl border-2 bg-primary-light px-2.5 py-1",
+          menuOpen ? "border-primary" : "border-transparent",
+        )}>
         <Avatar name={currentUser.profile?.name ?? currentUser.email} size={28} />
-        <div className="user-menu-label" style={{ textAlign: "left" }}>
-          <div
-            style={{
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontWeight: 600,
-              fontSize: 14,
-              color: "#1A1A1A",
-              lineHeight: 1.2,
-            }}>
+        {/* Name and role are hidden on phones to keep the header on one line */}
+        <div className="hidden text-left sm:block">
+          <div className="text-sm leading-tight font-semibold">
             {currentUser.profile?.preferredName ?? currentUser.profile?.name ?? currentUser.email}
           </div>
           {currentUser.role && (
-            <div
-              style={{
-                fontFamily: "Helvetica, Arial, sans-serif",
-                fontSize: 12,
-                color: colors.MAGENTA,
-                letterSpacing: "0.04em",
-              }}>
+            <div className="text-xs tracking-wide text-primary">
               {currentUser.profile?.title ? `${currentUser.profile.title} · ` : ""}
               {ROLE_LABELS[currentUser.role].toUpperCase()}
             </div>
           )}
         </div>
-        <span
-          style={{
-            fontSize: 10,
-            color: "#1A1A1A",
-            marginLeft: 2,
-            transition: "transform 0.2s",
-            display: "inline-block",
-            transform: menuOpen ? "rotate(180deg)" : "none",
-          }}>
-          ▾
-        </span>
+        <span className={cn("ml-0.5 text-2xs transition-transform", menuOpen && "rotate-180")}>▾</span>
       </button>
 
       {menuOpen && (
-        <div
-          style={{
-            position: "absolute",
-            top: "calc(100% + 8px)",
-            right: 0,
-            minWidth: 200,
-            background: "#fff",
-            border: "1px solid #C8DCF0",
-            borderRadius: 12,
-            boxShadow: "0 8px 24px rgba(10,26,50,0.12)",
-            overflow: "hidden",
-            zIndex: 50,
-          }}>
+        <div className="absolute top-full right-0 z-50 mt-2 min-w-50 overflow-hidden rounded-xl border bg-white shadow-lg">
           {/* Profile info header */}
-          <div style={{ padding: "14px 16px 10px", borderBottom: "1px solid #D4E6F5" }}>
-            <div
-              style={{ fontFamily: "Helvetica, Arial, sans-serif", fontWeight: 700, fontSize: 14, color: "#1A1A1A" }}>
-              {currentUser.profile?.name ?? currentUser.email}
-            </div>
-            <div style={{ fontFamily: "Helvetica, Arial, sans-serif", fontSize: 12, color: "#4A6B8A", marginTop: 2 }}>
-              {currentUser.email}
-            </div>
+          <div className="border-b border-divider px-4 pt-3.5 pb-2.5">
+            <div className="text-sm font-bold">{currentUser.profile?.name ?? currentUser.email}</div>
+            <div className="mt-0.5 text-xs text-muted">{currentUser.email}</div>
             {currentUser.role && (
               <span
-                style={{
-                  display: "inline-block",
-                  marginTop: 6,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: "0.05em",
-                  padding: "2px 8px",
-                  borderRadius: 4,
-                  background: ROLE_COLORS[currentUser.role].bg,
-                  color: ROLE_COLORS[currentUser.role].text,
-                }}>
+                className={cn(
+                  "mt-1.5 inline-block rounded-sm px-2 py-0.5 text-2xs font-bold tracking-wider",
+                  ROLE_BADGE_CLASSES[currentUser.role],
+                )}>
                 {ROLE_LABELS[currentUser.role].toUpperCase()}
               </span>
             )}
           </div>
+
           {/* Menu items */}
-          {[
-            {
-              label: "My Profile",
-              icon: "👤",
-              action: () => {
-                setMenuOpen(false);
-                navigate("/profile");
-              },
-            },
-            ...(isAdmin
-              ? [
-                  {
-                    label: "Admin Dashboard",
-                    icon: "⚙️",
-                    action: () => {
-                      setMenuOpen(false);
-                      window.open("/admin", "_blank", "noopener,noreferrer");
-                    },
-                  },
-                ]
-              : []),
-            {
-              label: "Request History",
-              icon: "📋",
-              action: () => {
-                setMenuOpen(false);
-                navigate("/history");
-              },
-            },
-          ].map((item) => (
+          {items.map((item) => (
             <button
               key={item.label}
-              onClick={item.action}
-              style={{
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "10px 16px",
-                border: "none",
-                background: "transparent",
-                cursor: "pointer",
-                fontFamily: "Helvetica, Arial, sans-serif",
-                fontSize: 14,
-                color: "#1A1A1A",
-                textAlign: "left",
-                transition: "background 0.1s",
+              onClick={() => {
+                setMenuOpen(false);
+                navigate(item.to);
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#F5F9FF")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
-              <span style={{ fontSize: 16 }}>{item.icon}</span> {item.label}
+              className={cn(MENU_ITEM, "hover:bg-hover")}>
+              <span className="text-base">{item.icon}</span> {item.label}
             </button>
           ))}
-          <div style={{ borderTop: "1px solid #D4E6F5" }}>
+
+          <div className="border-t border-divider">
             <button
               onClick={() => {
                 setMenuOpen(false);
                 handleLogout();
               }}
-              style={{
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "10px 16px",
-                border: "none",
-                background: "transparent",
-                cursor: "pointer",
-                fontFamily: "Helvetica, Arial, sans-serif",
-                fontSize: 14,
-                color: "#C0392B",
-                textAlign: "left",
-                transition: "background 0.1s",
-              }}
               disabled={loading}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#FFF0F0")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
-              <span style={{ fontSize: 16 }}>🚪</span> {loading ? "Logging out..." : "Log out"}
+              className={cn(MENU_ITEM, "text-danger hover:bg-red-50")}>
+              <span className="text-base">🚪</span> {loading ? "Signing out…" : "Sign Out"}
             </button>
           </div>
         </div>

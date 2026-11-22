@@ -52,19 +52,11 @@ export default function QuickDocsWidget({ docStore, onExpand, onClose }: QuickDo
         />
       )}
 
-      <div style={{ padding: "0 20px 18px", display: "flex", flexDirection: "column", gap: 2 }}>
+      <div className="flex flex-col gap-0.5 px-5 pb-4.5">
         {docs.length === 0 ? (
-          <div
-            style={{
-              padding: "24px 0",
-              textAlign: "center",
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 14,
-              color: "#1A1A1A",
-              opacity: 0.45,
-            }}>
+          <p className="py-6 text-center text-sm opacity-45">
             No documents yet — add one above
-          </div>
+          </p>
         ) : (
           docs.map((doc) => <DocEntry key={doc.id} doc={doc} />)
         )}

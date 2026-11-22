@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import AppHeader from "@components/AppHeader";
 import Avatar from "@icons/Avatar";
-import colors from "@styles/colors";
-import { ROLE_LABELS, ROLE_COLORS } from "../login/mockData";
+import { cn } from "@lib/cn";
+import { inputClass, labelClass, primaryButtonClass, sectionCardClass, tableHeadClass } from "@styles/ui";
+import { ROLE_LABELS, ROLE_BADGE_CLASSES } from "../login/mockData";
 import type { UserRole } from "../login/types";
 import { useAuth } from "../login/useAuth";
 import { useAdminUsers } from "./hooks";
@@ -12,40 +14,25 @@ import type { ReviewDecision } from "../requests/types";
 
 const ROLE_OPTIONS: UserRole[] = ["intern", "northstar", "admin"];
 
-const field: React.CSSProperties = {
-  padding: "8px 12px",
-  borderRadius: 7,
-  border: "1.5px solid #C8DCF0",
-  fontFamily: "Helvetica, Arial, sans-serif",
-  fontSize: 13,
-  color: "#1A1A1A",
-  outline: "none",
-  background: "#fff",
-};
+const CELL = "px-5 py-3";
+const TAB = "flex h-11 items-center border-b-2 px-5 text-sm";
 
-const label: React.CSSProperties = {
-  fontFamily: "Helvetica, Arial, sans-serif",
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: "0.05em",
-  color: "#1A1A1A",
-  display: "block",
-  marginBottom: 5,
-};
+/** Portal / Admin / Request History tabs under the header */
+function AdminTabs() {
+  const link = cn(TAB, "border-transparent font-medium transition-colors hover:border-primary/35 hover:text-primary");
 
-const card: React.CSSProperties = {
-  background: "#fff",
-  borderRadius: 14,
-  border: "1px solid #C8DCF0",
-  overflow: "hidden",
-};
-const cell: React.CSSProperties = { padding: "12px 20px" };
-
-const text = (fontSize: number, color = "#1A1A1A"): React.CSSProperties => ({
-  fontFamily: "Helvetica, Arial, sans-serif",
-  fontSize,
-  color,
-});
+  return (
+    <nav className="flex overflow-x-auto border-b bg-white px-4 sm:px-8">
+      <Link to="/" className={link}>
+        Portal
+      </Link>
+      <div className={cn(TAB, "border-primary font-bold text-primary")}>Admin</div>
+      <Link to="/history" className={link}>
+        Request History
+      </Link>
+    </nav>
+  );
+}
 
 export default function AdminPage() {
   const { user: me } = useAuth();
@@ -83,116 +70,18 @@ export default function AdminPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#FFFFFF" }}>
-      {/* Header */}
-      <header
-        className="app-header"
-        style={{
-          background: "#fff",
-          borderBottom: "1px solid #C8DCF0",
-          height: 60,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-        }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              background: colors.MAGENTA,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-            <span style={{ fontSize: 16, color: "#fff" }}>✦</span>
-          </div>
-          <span style={{ ...text(16), fontWeight: 700 }}>Intern Portal</span>
-        </div>
-      </header>
-
-      {/* Admin sub-nav */}
-      <nav
-        className="app-subnav"
-        style={{ background: "#fff", borderBottom: "1px solid #C8DCF0", display: "flex", alignItems: "stretch" }}>
-        <Link
-          to="/"
-          style={{
-            ...text(14),
-            padding: "0 20px",
-            height: 44,
-            display: "flex",
-            alignItems: "center",
-            fontWeight: 500,
-            textDecoration: "none",
-            borderBottom: "2px solid transparent",
-            transition: "color 0.15s, border-color 0.15s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = colors.MAGENTA;
-            e.currentTarget.style.borderBottomColor = `${colors.MAGENTA}55`;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = "#1A1A1A";
-            e.currentTarget.style.borderBottomColor = "transparent";
-          }}>
-          Portal
-        </Link>
-        <div
-          style={{
-            ...text(14, colors.MAGENTA),
-            padding: "0 20px",
-            display: "flex",
-            alignItems: "center",
-            fontWeight: 700,
-            borderBottom: `2px solid ${colors.MAGENTA}`,
-          }}>
-          Admin
-        </div>
-        <Link
-          to="/history"
-          style={{
-            ...text(14),
-            padding: "0 20px",
-            height: 44,
-            display: "flex",
-            alignItems: "center",
-            fontWeight: 500,
-            textDecoration: "none",
-            borderBottom: "2px solid transparent",
-            transition: "color 0.15s, border-color 0.15s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = colors.MAGENTA;
-            e.currentTarget.style.borderBottomColor = `${colors.MAGENTA}55`;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = "#1A1A1A";
-            e.currentTarget.style.borderBottomColor = "transparent";
-          }}>
-          Request History
-        </Link>
-      </nav>
-
-      <main
-        className="app-main"
-        style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 28 }}>
+    <div className="min-h-screen">
+      <main className="mx-auto flex max-w-225 flex-col gap-7 px-4 py-5 sm:px-8 sm:py-7">
         {/* Create user card */}
-        <div style={card}>
-          <div style={{ padding: "16px 24px", borderBottom: "1px solid #C8DCF0" }}>
-            <div style={{ ...text(16), fontWeight: 700 }}>Create New User</div>
-            <div style={{ ...text(13, "#4A6B8A"), marginTop: 2 }}>
-              Only admins can create accounts and assign roles.
-            </div>
+        <div className={sectionCardClass}>
+          <div className="border-b px-6 py-4">
+            <h2 className="font-bold">Create New User</h2>
+            <p className="mt-0.5 text-caption text-muted">Only admins can create accounts and assign roles.</p>
           </div>
-          <div style={{ padding: "20px 24px" }}>
-            <div className="admin-create-grid" style={{ alignItems: "end" }}>
-              <div>
-                <label htmlFor="new-email" style={label}>
+          <div className="px-6 py-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+              <div className="flex-1">
+                <label htmlFor="new-email" className={labelClass}>
                   EMAIL
                 </label>
                 <input
@@ -204,11 +93,11 @@ export default function AdminPage() {
                     setCreateError("");
                   }}
                   placeholder="user@portal.com"
-                  style={{ ...field, width: "100%", boxSizing: "border-box" }}
+                  className={cn(inputClass, "w-full text-caption")}
                 />
               </div>
-              <div>
-                <label htmlFor="new-password" style={label}>
+              <div className="flex-1">
+                <label htmlFor="new-password" className={labelClass}>
                   PASSWORD
                 </label>
                 <input
@@ -221,18 +110,18 @@ export default function AdminPage() {
                     setCreateError("");
                   }}
                   placeholder="temporary password"
-                  style={{ ...field, width: "100%", boxSizing: "border-box" }}
+                  className={cn(inputClass, "w-full text-caption")}
                 />
               </div>
               <div>
-                <label htmlFor="new-role" style={label}>
+                <label htmlFor="new-role" className={labelClass}>
                   ROLE
                 </label>
                 <select
                   id="new-role"
                   value={newRole}
                   onChange={(e) => setNewRole(e.target.value as UserRole)}
-                  style={{ ...field, cursor: "pointer" }}>
+                  className={cn(inputClass, "w-full text-caption")}>
                   {ROLE_OPTIONS.map((r) => (
                     <option key={r} value={r}>
                       {ROLE_LABELS[r]}
@@ -240,103 +129,66 @@ export default function AdminPage() {
                   ))}
                 </select>
               </div>
-              <button
-                onClick={handleCreate}
-                disabled={creating}
-                style={{
-                  ...text(13, "#fff"),
-                  padding: "8px 18px",
-                  borderRadius: 7,
-                  border: "none",
-                  background: colors.MAGENTA,
-                  fontWeight: 700,
-                  cursor: creating ? "default" : "pointer",
-                  opacity: creating ? 0.7 : 1,
-                }}>
+              <button onClick={handleCreate} disabled={creating} className={cn(primaryButtonClass, "text-caption font-bold")}>
                 {creating ? "Creating…" : "Create"}
               </button>
             </div>
-            {createError && <div style={{ ...text(13, "#C0392B"), marginTop: 10 }}>{createError}</div>}
-            {createSuccess && <div style={{ ...text(13, "#22C55E"), marginTop: 10 }}>{createSuccess}</div>}
+            {createError && <p className="mt-2.5 text-caption text-danger">{createError}</p>}
+            {createSuccess && <p className="mt-2.5 text-caption text-green-500">{createSuccess}</p>}
           </div>
         </div>
-        <ProfileRequestsCard
-          requests={requests.filter((r) => r.status === "pending")}
-          error={requestsError}
-          onReview={handleReview}
-        />
+
+        <ProfileRequestsCard requests={requests.filter((r) => r.status === "pending")} error={requestsError} onReview={handleReview} />
+
         {/* Users table */}
-        <div style={card}>
-          <div
-            style={{
-              padding: "16px 24px",
-              borderBottom: "1px solid #C8DCF0",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}>
-            <div style={{ ...text(16), fontWeight: 700 }}>All Users</div>
-            <span style={text(13, "#4A6B8A")}>{loading ? "Loading…" : `${users.length} total`}</span>
+        <div className={sectionCardClass}>
+          <div className="flex items-center justify-between border-b px-6 py-4">
+            <h2 className="font-bold">All Users</h2>
+            <span className="text-caption text-muted">{loading ? "Loading…" : `${users.length} total`}</span>
           </div>
-          {error && <div style={{ ...text(13, "#C0392B"), padding: "10px 24px" }}>{error}</div>}
-          <div className="admin-table-wrap" style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          {error && <p className="px-6 py-2.5 text-caption text-danger">{error}</p>}
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
               <thead>
                 <tr>
                   {["User", "Email", "Role", "Profile", "Actions"].map((h) => (
-                    <th
-                      key={h}
-                      style={{
-                        ...text(11, "#4A6B8A"),
-                        padding: "10px 20px",
-                        textAlign: "left",
-                        fontWeight: 700,
-                        letterSpacing: "0.06em",
-                        borderBottom: "1px solid #C8DCF0",
-                      }}>
+                    <th key={h} className={tableHeadClass}>
                       {h.toUpperCase()}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody>
-                {users.map((u, i) => {
-                  const roleInfo = u.role ? ROLE_COLORS[u.role] : null;
+              <tbody className="divide-y divide-divider text-xs">
+                {users.map((u) => {
                   const isMe = u.id === me?.id;
 
                   return (
-                    <tr key={u.id} style={{ borderBottom: i < users.length - 1 ? "1px solid #D4E6F5" : "none" }}>
-                      <td style={cell}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <tr key={u.id}>
+                      <td className={CELL}>
+                        <div className="flex items-center gap-2.5">
                           <Avatar name={u.profile?.name ?? u.email} size={30} />
                           <div>
-                            <div style={{ ...text(14), fontWeight: 600 }}>
+                            <div className="text-sm font-semibold">
                               {u.profile?.name ?? "—"}
-                              {isMe && <span style={text(12, "#4A6B8A")}> (you)</span>}
+                              {isMe && <span className="text-xs font-normal text-muted"> (you)</span>}
                             </div>
                             {u.profile?.preferredName && u.profile.preferredName !== u.profile.name && (
-                              <div style={text(12, "#4A6B8A")}>"{u.profile.preferredName}"</div>
+                              <div className="text-muted">"{u.profile.preferredName}"</div>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td style={{ ...cell, ...text(13) }}>{u.email}</td>
-                      <td style={cell}>
+                      <td className={cn(CELL, "text-caption")}>{u.email}</td>
+                      <td className={CELL}>
                         <select
                           value={u.role ?? ""}
                           disabled={isMe}
                           title={isMe ? "You can't change your own role" : undefined}
                           onChange={(e) => setRole(u.id, e.target.value as UserRole)}
-                          style={{
-                            ...text(12, roleInfo ? roleInfo.text : "#666"),
-                            padding: "5px 10px",
-                            borderRadius: 6,
-                            border: `1.5px solid ${roleInfo ? roleInfo.text : "#C8DCF0"}`,
-                            background: roleInfo ? roleInfo.bg : "#fff",
-                            fontWeight: 600,
-                            cursor: isMe ? "not-allowed" : "pointer",
-                            outline: "none",
-                          }}>
+                          className={cn(
+                            "rounded-md border px-2.5 py-1 font-semibold outline-none disabled:cursor-not-allowed",
+                            u.role ? ROLE_BADGE_CLASSES[u.role] : "bg-white text-neutral-500",
+                          )}>
                           <option value="" disabled>
                             — assign —
                           </option>
@@ -347,19 +199,15 @@ export default function AdminPage() {
                           ))}
                         </select>
                       </td>
-                      <td style={cell}>
-                        {u.profile ? (
-                          <span style={{ ...text(12, "#22C55E"), fontWeight: 600 }}>✓ Complete</span>
-                        ) : (
-                          <span style={text(12, "#8FA5BC")}>Pending</span>
-                        )}
+                      <td className={CELL}>
+                        {u.profile ? <span className="font-semibold text-green-500">✓ Complete</span> : <span className="text-subtle">Pending</span>}
                       </td>
-                      <td style={cell}>
+                      <td className={CELL}>
                         {u.profile && (
-                          <div style={text(12)}>
+                          <>
                             {u.profile.title && <div>{u.profile.title}</div>}
-                            {u.profile.phone && <div style={{ color: "#4A6B8A" }}>{u.profile.phone}</div>}
-                          </div>
+                            {u.profile.phone && <div className="text-muted">{u.profile.phone}</div>}
+                          </>
                         )}
                       </td>
                     </tr>

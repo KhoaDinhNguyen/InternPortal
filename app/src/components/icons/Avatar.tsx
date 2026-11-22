@@ -19,6 +19,7 @@ function initials(name: string) {
     .toUpperCase();
 }
 
+/** Deterministic colour per name, so a person always gets the same avatar */
 function avatarColor(name: string) {
   let h = 0;
   for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
@@ -26,29 +27,12 @@ function avatarColor(name: string) {
 }
 
 export default function Avatar({ name, size = 22 }: { name: string; size?: number }) {
-  const bg = avatarColor(name);
   return (
+    // Size and colour come from props/data, so they stay inline
     <div
-      style={{
-        width: size,
-        height: size,
-        borderRadius: "50%",
-        background: bg,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-      }}>
-      <span
-        style={{
-          fontFamily: "Helvetica, Arial, sans-serif",
-          fontWeight: 700,
-          fontSize: size * 0.38,
-          color: "#fff",
-          lineHeight: 1,
-        }}>
-        {initials(name)}
-      </span>
+      className="flex shrink-0 items-center justify-center rounded-full font-bold leading-none text-white"
+      style={{ width: size, height: size, fontSize: size * 0.38, background: avatarColor(name) }}>
+      {initials(name)}
     </div>
   );
 }

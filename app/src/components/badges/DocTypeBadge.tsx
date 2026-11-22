@@ -1,28 +1,15 @@
-import colors from "../../styles/colors";
-
-const colorsBadge: Record<string, string> = {
-  PDF: colors.MAGENTA,
-  Doc: colors.TERTIARY,
-  Form: colors.SECONDARY,
-  Sheet: colors.SECONDARY,
-  Slide: colors.TERTIARY,
+const BADGE_CLASSES: Record<string, string> = {
+  PDF: "bg-primary/13 text-primary",
+  Doc: "bg-tertiary/13 text-tertiary",
+  Form: "bg-secondary/13 text-secondary",
+  Sheet: "bg-secondary/13 text-secondary",
+  Slide: "bg-tertiary/13 text-tertiary",
 };
 
 export default function DocTypeBadge({ type }: { type: string }) {
-  const c = colorsBadge[type] || "#6B7280";
-
   return (
     <span
-      style={{
-        fontSize: 12,
-        fontFamily: "Helvetica, Arial, sans-serif",
-        fontWeight: 500,
-        letterSpacing: "0.05em",
-        padding: "2px 6px",
-        borderRadius: 3,
-        background: `${c}22`,
-        color: c,
-      }}>
+      className={`rounded-xs px-1.5 py-0.5 text-xs font-medium tracking-wider ${BADGE_CLASSES[type] ?? "bg-gray-500/13 text-gray-500"}`}>
       {type}
     </span>
   );

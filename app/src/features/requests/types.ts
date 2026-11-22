@@ -16,11 +16,14 @@ export interface ProfileUpdateRequest {
   adminNote?: string;
 }
 
+/** Profile-review outcomes, plus ticket alerts for the digital team */
+export type NotificationKind = ReviewDecision | "ticket" | "ticketResolved";
+
 export interface UserNotification {
   /** Numeric so it can be shown through the existing Announcement widget */
   id: number;
   userId: string;
-  kind: ReviewDecision;
+  kind: NotificationKind;
   title: string;
   body: string;
   createdAt: string;

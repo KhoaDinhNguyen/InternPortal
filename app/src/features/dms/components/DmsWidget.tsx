@@ -30,6 +30,7 @@ interface DmsWidgetProps {
   ) => DmMessage | null;
   toggleReaction: (convoId: string, msgId: string, emoji: string) => void;
   togglePin: (convoId: string) => void;
+  toggleMute: (convoId: string) => void;
 }
 
 export default function DmsWidget(props: DmsWidgetProps) {
@@ -44,6 +45,7 @@ export default function DmsWidget(props: DmsWidgetProps) {
     active,
     totalUnread,
     togglePin,
+    toggleMute,
     fullscreen,
     onExpand,
   } = props;
@@ -79,28 +81,10 @@ export default function DmsWidget(props: DmsWidgetProps) {
   }
 
   return (
-    <div style={{ display: "flex", height: "100%", minHeight: 480 }}>
+    <div className="flex h-full min-h-120">
       {/* Conversation list */}
-      <div
-        style={{
-          width: 270,
-          borderRight: "1px solid #D4E6F5",
-          display: "flex",
-          flexDirection: "column",
-          flexShrink: 0,
-        }}>
-        <div style={{ padding: "14px 20px 10px", borderBottom: "1px solid #D4E6F5" }}>
-          <span
-            style={{
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontSize: 11,
-              color: "#1A1A1A",
-              letterSpacing: "0.08em",
-              fontWeight: 600,
-            }}>
-            MESSAGES
-          </span>
-        </div>
+      <div className="flex w-68 shrink-0 flex-col border-r border-divider">
+        <div className="border-b border-divider px-5 pt-3.5 pb-2.5 text-2xs font-semibold tracking-widest">MESSAGES</div>
         <ConversationList
           authId={ME_ID}
           activeId={activeId}
@@ -117,7 +101,7 @@ export default function DmsWidget(props: DmsWidgetProps) {
         active={active}
         name={active ? convoName(active) : ""}
         otherUser={active?.type === "direct" ? otherUser(active) : null}
-        // onToggleMute={() => active && toggleMute(active.id)}
+        onToggleMute={() => active && toggleMute(active.id)}
         onTogglePin={() => active && togglePin(active.id)}
         hoveredId={hoveredMsgId}
         handlersFor={handlersFor}
